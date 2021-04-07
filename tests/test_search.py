@@ -1,18 +1,23 @@
 from model import parameters
-import random
+from random import choice
 import pprint
 import pytest
 
+#TODO: подружить с монгой(?) чтобы взять сити id из БД
 
-@pytest.mark.repeat(3)
+@pytest.mark.repeat(4)
 def test_search_random(app):
-    search = app.search_random(app, page=0, pagesize=5, phrase=random.choice(parameters.phrase), sort=random.choice(parameters.sort),
-                             cityid=random.choice(parameters.cityid), withprice=random.choice(parameters.withprice),
-                             withprofit=random.choice(parameters.withprofit), withpromoVits=random.choice(parameters.withpromoVits))
+    cityid = choice(parameters.cityid)
+    search = app.search_random(app, page=0, pagesize=5, phrase=choice(parameters.phrase), sort=choice(parameters.sort),
+                             cityid=cityid, withprice=choice(parameters.withprice),
+                             withprofit=choice(parameters.withprofit), withpromoVits=choice(parameters.withpromoVits))
     formatted_json_str = pprint.pformat(search.text)
     print(search.url, formatted_json_str, sep='\n\n')
     #print(search.url, search.text, sep='\n')
-    assert search.status_code == 200
+    if cityid == '5e574663b1585900015ed444':
+        assert search.status_code == 400
+    else:
+        assert search.status_code == 200
 
 
 def test_search_tags(app):
@@ -31,7 +36,7 @@ def test_search_tags(app):
 
 def test_search_hyphen(app):
     search = app.search(app, phrase='крем-гель', sort='Default',
-                        cityid=random.choice(parameters.cityid), withprice='false', withprofit='false',
+                        cityid=choice(parameters.cityid), withprice='false', withprofit='false',
                         withpromoVits='false')
     formatted_json_str = pprint.pformat(search.text)
     print(search.url, formatted_json_str, sep='\n\n')
@@ -42,7 +47,7 @@ def test_search_hyphen(app):
 
 def test_search_hyphen2(app):
     search = app.search(app, phrase='кремгель', sort='Default',
-                        cityid=random.choice(parameters.cityid), withprice='false', withprofit='false',
+                        cityid=choice(parameters.cityid), withprice='false', withprofit='false',
                         withpromoVits='false')
     formatted_json_str = pprint.pformat(search.text)
     print(search.url, formatted_json_str, sep='\n\n')
@@ -53,7 +58,7 @@ def test_search_hyphen2(app):
 
 def test_search_hyphen3(app):
     search = app.search(app, phrase='крем гель', sort='Default',
-                        cityid=random.choice(parameters.cityid), withprice='false', withprofit='false',
+                        cityid=choice(parameters.cityid), withprice='false', withprofit='false',
                         withpromoVits='false')
     formatted_json_str = pprint.pformat(search.text)
     print(search.url, formatted_json_str, sep='\n\n')
@@ -64,7 +69,7 @@ def test_search_hyphen3(app):
 
 def test_search_translit(app):
     search = app.search(app, phrase='авене', sort='Default',
-                        cityid=random.choice(parameters.cityid), withprice='false', withprofit='false',
+                        cityid=choice(parameters.cityid), withprice='false', withprofit='false',
                         withpromoVits='false')
     #print(search.url, search.text, sep='\n')
     formatted_json_str = pprint.pformat(search.text)
@@ -108,16 +113,13 @@ def test_search_typo(app):
 
 
 def test_search_over_pagination(app):
-    search = app.search_random(app, page=1000, pagesize=5, phrase=random.choice(parameters.phrase),
-                               sort=random.choice(parameters.sort),
-                               cityid=random.choice(parameters.cityid), withprice=random.choice(parameters.withprice),
-                               withprofit=random.choice(parameters.withprofit),
-                               withpromoVits=random.choice(parameters.withpromoVits))
+    search = app.search_random(app, page=1000, pagesize=5, phrase=choice(parameters.phrase),
+                               sort=choice(parameters.sort),
+                               cityid=choice(parameters.cityid), withprice=choice(parameters.withprice),
+                               withprofit=choice(parameters.withprofit),
+                               withpromoVits=choice(parameters.withpromoVits))
     formatted_json_str = pprint.pformat(search.text)
     print(search.url, formatted_json_str, sep='\n\n')
     #print(search.url, search.text, sep='\n')
     assert "\"result\":[{" not in search.text
     assert "\"result\":[]" in search.text
-
-
-
