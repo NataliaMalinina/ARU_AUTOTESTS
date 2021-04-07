@@ -7,7 +7,7 @@ from random import choice
 
 def test_choice_city(app):
     cityid = choice(parameters.cityid)
-    choice_city = app.choice_city(app, id=cityid, manualChange=True)
+    choice_city = app.choice_city(id=cityid, manualChange=True)
     formatted_json_str = pprint.pformat(choice_city.text)
     print(choice_city.url, formatted_json_str, sep='\n\n')
     if cityid == '5e574663b1585900015ed444':
@@ -21,7 +21,7 @@ def test_choice_city(app):
 def test_choice_city_admin_user(app):
     authorization = loads(app.auth_admin_user())
     headers = {'Authorization': f"Bearer {authorization['token']}"}
-    choice_city = app.choice_city_admin(app, id='5e574663f4d315000196b176', manualChange=True, userid='5ee852c50521b00001edffed', head=headers)
+    choice_city = app.choice_city_admin(id='5e574663f4d315000196b176', manualChange=True, userid='5ee852c50521b00001edffed', head=headers)
     formatted_json_str = pprint.pformat(choice_city.text)
     print(choice_city.url, formatted_json_str, sep='\n\n')
     assert choice_city.status_code == 200
