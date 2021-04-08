@@ -1,4 +1,5 @@
 import requests.api
+from json import loads
 
 
 class Application:
@@ -15,7 +16,17 @@ class Application:
 
     def auth_admin_user(self):
         data = {"userName": "MNS", "password": "Prokhorova23"}
-        return self._s.post(self.host + '/AdminUser/Auth', json=data).text
+        return self._s.post(self.host + '/AdminUser/Auth', json=data)
+
+    def token_autorization(self):
+        authorization = loads(self.auth(phone='+79139519213', code='9213').text)
+        head = {'Authorization': f"Bearer {authorization['token']}"}
+        return head
+
+    def auth_admin_user_token(self):
+        authorization = loads(self.auth_admin_user().text)
+        head = {'Authorization': f"Bearer {authorization['token']}"}
+        return head
 
     def search_random(self, page, pagesize, phrase, sort, cityid, withprice, withprofit, withpromoVits):
         payload = {"page": f'{page}', "pagesize": f'{pagesize}', "phrase": f'{phrase}',
@@ -41,4 +52,15 @@ class Application:
         data = {"id": f'{id}', "manualChange": manualChange, "userId": userid}
         return self._s.put(self.host + '/City/UserCity', json=data, headers=head)
 
-    # def choice_autodest(self, host):
+    def choice_autodest(self, id):
+        data = {"id": f'{id}'}
+        return self._s.put(self.host + '/AutoDest/UserAutoDest', json=data)
+
+    def choice_autodest_auth_user(self, id, head):
+        data = {"id": f'{id}'}
+        return self._s.put(self.host + '/AutoDest/UserAutoDest', json=data, headers=head)
+
+    def choice_autodest_su(self, id, userid, head):
+        data = {"id": f'{id}', "userId": f'{userid}'}
+        return self._s.put(self.host + '/AutoDest/UserAutoDest', json=data, headers=head)
+
