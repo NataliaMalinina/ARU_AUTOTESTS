@@ -1,3 +1,5 @@
+from random import choice, randrange
+import string
 
 phrase = ('Ношпа', 'qjl', 'зелёнка', 'Гинко', 'Nivea', 'посай', 'корица', ',jkm d cgbyt', 'YFANBPBY', 'виши', 'ANAPHASE+')
 sort = ('Default', 'DefaultAsc', 'ByName', 'ByNameDesc', 'ByPrice', 'ByPriceDesc')
@@ -14,7 +16,17 @@ autodestid_with_mark_without_bezn = ('603f3ef6fd563be5e186b967', '5d88759d92c02e
                                      '603f3ef4fd563be5e186b935', '603f3ef7cc79d08973eb6939')
 autodestid_without_mark_with_beznal = ('603f3ef7fd563be5e186b96f', '603f3ef7cc79d08973eb6936', '603f3ef6fd563be5e186b968',
                                        '603f3ef6fd563be5e186b964', '603f3ef6fd563be5e186b95a')
+rating = [1, 2, 3, 4, 5]
 
+
+def random_string(length):
+    symbols = string.ascii_letters + string.digits + string.punctuation + " "*10
+    rand_string = "".join([choice(symbols) for i in range(randrange(length))])
+    return rand_string
+
+
+def select_autodest():
+    return choice(autodestid_with_mark_and_bezn+autodestid_without_mark_and_bezn+autodestid_with_mark_without_bezn+autodestid_without_mark_with_beznal)
 
 
 #TODO здесь в параметрах делать выборку id из монги, я думаю

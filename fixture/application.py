@@ -78,5 +78,9 @@ class Application:
         data = {"id": f'{id}', "userId": f'{userid}'}
         return self._s.put(self.host + '/AutoDest/UserAutoDest', json=data, headers=head)
 
-    """ Отзыв на аптеку """
+    def autodest_review(self, head, autoDestId, rating, review, fio, orderNum, customReason, complaints):
+        body = {"autoDestId": f'{autoDestId}', "rating": rating, "review": f'{review}', "fio": f'{fio}',
+                "orderNum": orderNum, "complaints": {"standardReasons": complaints, "customReason": f'{customReason}'}}
+        return self._s.put(self.host + '/AutoDest/Review', json=body, headers=head)
 
+# ["Staff", "Delivery", "Cashless", "Location", "Schedule"]
