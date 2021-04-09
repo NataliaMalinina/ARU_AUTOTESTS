@@ -63,4 +63,3 @@ class Application:
     def choice_autodest_su(self, id, userid, head):
         data = {"id": f'{id}', "userId": f'{userid}'}
         return self._s.put(self.host + '/AutoDest/UserAutoDest', json=data, headers=head)
-

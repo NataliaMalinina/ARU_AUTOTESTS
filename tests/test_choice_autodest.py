@@ -68,9 +68,3 @@ def test_choice_autodest_su(app):
     print(choice_autodest.url, formatted_json_str, sep='\n\n')
     assert choice_autodest.status_code == 200
 
-
-
-
-
-
-
