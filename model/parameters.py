@@ -29,4 +29,19 @@ def select_autodest():
     return choice(autodestid_with_mark_and_bezn+autodestid_without_mark_and_bezn+autodestid_with_mark_without_bezn+autodestid_without_mark_with_beznal)
 
 
+def random_reason():
+    standardReasons = ("Staff", "Delivery", "Cashless", "Location", "Schedule")
+    null = None
+    reason = choice(standardReasons or null)
+    return reason
+
+def random_custom_reason():
+    customer_reason = random_string(99)
+    null = None
+    custom_reason = (customer_reason or null)
+    return custom_reason
+
+
+
+
 #TODO здесь в параметрах делать выборку id из монги, я думаю
