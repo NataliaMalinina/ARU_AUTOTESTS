@@ -90,3 +90,7 @@ class Application:
                 "orderNum": orderNum, "complaints": {"standardReasons": complaints, "customReason": customReason}}
         return self._s.put(self.host + '/AutoDest/Review', json=body, headers=head)
 
+    def edit_autodest_review(self, head, id, rating, review):
+        body = {"id": f'{id}', "rating": rating, "review": f'{review}'}
+        return self._s.put(self.host + '/AutoDest/EditReview', json=body, headers=head)
+
