@@ -5,7 +5,7 @@ import pytest
 
 #TODO: подружить с монгой(?) чтобы взять сити id из БД
 
-@pytest.mark.repeat(4)
+@pytest.mark.repeat(5)
 def test_search_random(app):
     cityid = choice(parameters.cityid)
     search = app.search_random(page=0, pagesize=5, phrase=choice(parameters.phrase), sort=choice(parameters.sort),

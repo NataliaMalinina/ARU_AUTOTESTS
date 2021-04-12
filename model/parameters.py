@@ -1,4 +1,4 @@
-from random import choice, randrange
+from random import choice, choices, randrange, randint, sample
 import string
 
 phrase = ('Ношпа', 'qjl', 'зелёнка', 'Гинко', 'Nivea', 'посай', 'корица', ',jkm d cgbyt', 'YFANBPBY', 'виши', 'ANAPHASE+')
@@ -30,15 +30,16 @@ def select_autodest():
 
 
 def random_reason():
-    standardReasons = ("Staff", "Delivery", "Cashless", "Location", "Schedule")
-    null = None
-    reason = choice(standardReasons or null)
+    index = randint(0, 4)
+    standardReasons = ('Staff', 'Delivery', 'Cashless', 'Location', 'Schedule')
+    reason = sample(standardReasons, index)
     return reason
+
 
 def random_custom_reason():
     customer_reason = random_string(99)
     null = None
-    custom_reason = (customer_reason or null)
+    custom_reason = customer_reason or null
     return custom_reason
 
 

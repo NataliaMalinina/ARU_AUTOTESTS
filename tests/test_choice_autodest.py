@@ -61,6 +61,7 @@ def test_choice_autodest_without_mark_with_beznal_auth_user(app):
     print(choice_autodest.url, formatted_json_str, sep='\n\n')
     assert choice_autodest.status_code == 200
 
+
 def test_choice_autodest_su(app):
     choice_autodest = app.choice_autodest_su(id=choice(parameters.autodestid_with_mark_and_bezn),
                                              userid='5ee852c50521b00001edffed', head=app.token_auth_admin_user())

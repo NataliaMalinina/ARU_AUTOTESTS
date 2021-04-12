@@ -10,7 +10,7 @@ class Application:
     def __init__(self, host):
         self.host = host
 
-    """ Авторизация """
+# Авторизация
 
     def auth(self, phone, code):
         data = {"type": "BySms", "code": f'{code}', "phone": f'{phone}', "timeZone": 0, "referalId": None}
@@ -20,7 +20,7 @@ class Application:
         data = {"userName": "MNS", "password": "Prokhorova23"}
         return self._s.post(self.host + '/AdminUser/Auth', json=data)
 
-    """ Получение токена """
+# Получение токена
 
     def token_autorization(self):
         authorization = loads(self.auth(phone='+79139519213', code='9213').text)
@@ -32,7 +32,12 @@ class Application:
         head = {'Authorization': f"Bearer {authorization['token']}"}
         return head
 
-    """ Поиск по фразе """
+    def token_shadow_user(self):
+        authorization = self.choice_city(id='5e574663f4d315000196b176', manualChange=True).headers
+        head = {'Authorization': f"Bearer {authorization['X-Shadowuser']}"}
+        return head
+
+# Поиск по фразе
 
     def search_random(self, page, pagesize, phrase, sort, cityid, withprice, withprofit, withpromoVits):
         payload = {"page": f'{page}', "pagesize": f'{pagesize}', "phrase": f'{phrase}',
@@ -50,7 +55,7 @@ class Application:
                    "withprice": f'{withprice}', "withprofit": f'{withprofit}', "withpromoVits": f'{withpromoVits}'}
         return self._s.get(self.host + '/Search/ByPhrase', params=payload)
 
-    """ Выбор города """
+# Выбор города
 
     def choice_city(self, id, manualChange):
         data = {"id": id, "manualChange": manualChange}
@@ -64,7 +69,7 @@ class Application:
         data = {"id": f'{id}', "manualChange": manualChange}
         return self._s.put(self.host + '/City/UserCity', json=data, headers=head)
 
-    """ Выбор аптеки """
+# Выбор аптеки
 
     def choice_autodest(self, id):
         data = {"id": f'{id}'}
@@ -78,9 +83,10 @@ class Application:
         data = {"id": f'{id}', "userId": f'{userid}'}
         return self._s.put(self.host + '/AutoDest/UserAutoDest', json=data, headers=head)
 
+# Отзыв на аптеку
+
     def autodest_review(self, head, autoDestId, rating, review, fio, orderNum, customReason, complaints):
-        body = {"autoDestId": f'{autoDestId}', "rating": rating, "review": f'{review}', "fio": f'{fio}',
-                "orderNum": orderNum, "complaints": {"standardReasons": complaints, "customReason": f'{customReason}'}}
+        body = {"autoDestId": f'{autoDestId}', "rating": rating, "review": f'{review}', "fio": fio,
+                "orderNum": orderNum, "complaints": {"standardReasons": complaints, "customReason": customReason}}
         return self._s.put(self.host + '/AutoDest/Review', json=body, headers=head)
 
-# ["Staff", "Delivery", "Cashless", "Location", "Schedule"]
