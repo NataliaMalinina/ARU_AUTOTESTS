@@ -1,4 +1,4 @@
-from random import choice, choices, randrange, randint, sample
+from random import choice, randrange, randint, sample
 import string
 
 phrase = ('Ношпа', 'qjl', 'зелёнка', 'Гинко', 'Nivea', 'посай', 'корица', ',jkm d cgbyt', 'YFANBPBY', 'виши', 'ANAPHASE+')
@@ -21,8 +21,8 @@ rating = [1, 2, 3, 4, 5]
 
 def random_string(length):
     symbols = string.ascii_letters + string.digits + string.punctuation + " "*10
-    rand_string = "".join([choice(symbols) for i in range(randrange(length))])
-    return rand_string
+    random_string = "".join([choice(symbols) for i in range(randrange(length))])
+    return random_string
 
 
 def select_autodest():

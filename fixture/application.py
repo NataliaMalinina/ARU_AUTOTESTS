@@ -94,3 +94,5 @@ class Application:
         body = {"id": f'{id}', "rating": rating, "review": f'{review}'}
         return self._s.put(self.host + '/AutoDest/EditReview', json=body, headers=head)
 
+    #def delete_autodest_review(self, head, id):
+
