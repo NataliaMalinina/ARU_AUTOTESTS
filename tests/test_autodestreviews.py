@@ -92,7 +92,7 @@ def test_add_autodest_review_wrong_order_num(app):
 
 
 def test_add_autodest_review_over_5000(app):
-    review_over_5000 = random_string(randrange(5001, 10000))
+    review_over_5000 = random_string(randrange(5000, 6000))
     autodest_review = app.autodest_review(head=app.token_autorization(), autoDestId=select_autodest(),
                                           rating=choice(parameters.rating),
                                           review=review_over_5000, fio=random_string(15), orderNum=None,
@@ -136,7 +136,7 @@ def test_edit_autodest_review_edit(app):
                                           complaints=random_reason(),
                                           customReason=random_custom_reason())
     id_review = autodest_review.text.replace('\"', '')
-    edit_review = app.edit_autodest_review(head=app.token_autorization(), id=id_review, rating=choice(parameters.rating), review=random_string(5050))
+    edit_review = app.edit_autodest_review(head=app.token_autorization(), id=id_review, rating=choice(parameters.rating), review=random_string(180))
     formatted_json_str = pprint.pformat(edit_review.text)
     print(edit_review.request.body)
     print(edit_review.url, formatted_json_str, sep='\n\n')

@@ -1,5 +1,6 @@
-from random import choice, randrange, randint, sample
+from random import choice, randint, sample
 import string
+
 
 phrase = ('Ношпа', 'qjl', 'зелёнка', 'Гинко', 'Nivea', 'посай', 'корица', ',jkm d cgbyt', 'YFANBPBY', 'виши', 'ANAPHASE+')
 sort = ('Default', 'DefaultAsc', 'ByName', 'ByNameDesc', 'ByPrice', 'ByPriceDesc')
@@ -21,7 +22,7 @@ rating = [1, 2, 3, 4, 5]
 
 def random_string(length):
     symbols = string.ascii_letters + string.digits + string.punctuation + " "*10
-    random_string = "".join([choice(symbols) for i in range(randrange(length))])
+    random_string = "".join([choice(symbols) for i in range(length)])
     return random_string
 
 

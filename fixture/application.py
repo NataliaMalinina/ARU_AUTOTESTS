@@ -83,6 +83,10 @@ class Application:
         data = {"id": f'{id}', "userId": f'{userid}'}
         return self._s.put(self.host + '/AutoDest/UserAutoDest', json=data, headers=head)
 
+    def autodest_info(self, autoDestId):
+        parameters = {"autoDestId": f'{autoDestId}'}
+        return self._s.get(self.host + '/AutoDest/ById', params=parameters)
+
 # Отзыв на аптеку
 
     def autodest_review(self, head, autoDestId, rating, review, fio, orderNum, customReason, complaints):
