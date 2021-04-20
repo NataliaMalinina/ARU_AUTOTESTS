@@ -1,5 +1,6 @@
 import requests.api
 from json import loads
+from fixture.orders_helper import OrdersHelper
 
 
 class Application:
@@ -9,6 +10,7 @@ class Application:
 
     def __init__(self, host):
         self.host = host
+        self.order_fixture = OrdersHelper(self)
 
 # Авторизация
 
@@ -89,9 +91,9 @@ class Application:
 
 # Отзыв на аптеку
 
-    def autodest_review(self, head, autoDestId, rating, review, fio, orderNum, customReason, complaints):
+    def autodest_review(self, head, autoDestId, rating, review, fio, orderNum, customReason, standardReasons):
         body = {"autoDestId": f'{autoDestId}', "rating": rating, "review": f'{review}', "fio": fio,
-                "orderNum": orderNum, "complaints": {"standardReasons": complaints, "customReason": customReason}}
+                "orderNum": orderNum, "complaints": {"standardReasons": standardReasons, "customReason": customReason}}
         return self._s.put(self.host + '/AutoDest/Review', json=body, headers=head)
 
     def edit_autodest_review(self, head, id, rating, review):
