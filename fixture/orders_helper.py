@@ -1,5 +1,6 @@
-from random import randint
+from random import randint, choice
 from model import parameters
+from json import loads
 
 class OrdersHelper:
 
@@ -20,18 +21,9 @@ class OrdersHelper:
         body = {"items": dataset}
         return self.app._s.put(self.app.host + '/Cart', json=body, headers=head)
 
-    def cart_su(self, head, dataset, userId=None):
-        body = {"items": dataset, "userId": userId}
-        return self.app._s.put(self.app.host + '/Cart', json=body, headers=head)
-
-    def order(self, email, needEmail, needCall, mnogoRuCardId, head):
+    def create_order(self, email, needEmail, needCall, mnogoRuCardId, head):
         body = {"email": f'{email}', "needEmail": needEmail, "needCall": needCall,
                 "mnogoRuCardId": mnogoRuCardId}
-        return self.app._s.put(self.app.host + '/Order', json=body, headers=head)
-
-    def order_su(self, email, needEmail, needCall, mnogoRuCardId, head, userId=None):
-        body = {"email": email, "needEmail": needEmail, "needCall": needCall,
-                "mnogoRuCardId": mnogoRuCardId, "userId": userId}
         return self.app._s.put(self.app.host + '/Order', json=body, headers=head)
 
     def dataset_min_sum(self, head):
@@ -40,3 +32,28 @@ class OrdersHelper:
         dataset.append(payload)
         body = {"items": dataset}
         return self.app._s.put(self.app.host + '/Cart', json=body, headers=head)
+
+# Для SU
+
+    def cart_su(self, head, dataset, userId=None):
+        body = {"items": dataset, "userId": userId}
+        return self.app._s.put(self.app.host + '/Cart', json=body, headers=head)
+
+    def create_order_su(self, email, needEmail, needCall, mnogoRuCardId, head, userId=None):
+        body = {"email": email, "needEmail": needEmail, "needCall": needCall,
+                "mnogoRuCardId": mnogoRuCardId, "userId": userId}
+        return self.app._s.put(self.app.host + '/Order', json=body, headers=head)
+
+    def list_of_orders_su(self, head, page=0, pagesize=30):
+        payload = {"page": page, "pagesize": pagesize}
+        return self.app._s.get(self.app.host + '/SuperUser/Orders', params=payload, headers=head)
+
+    def id_order_for_su(self, head):
+        list_of_orders = loads(self.list_of_orders_su(head, page=0, pagesize=30).text)
+        orderId = choice(list_of_orders['data'])['id']
+        return orderId
+
+    def order_block_su(self, head, orderId):
+        body = {"orderId": orderId}
+        return self.app._s.put(self.app.host + '/SuperUser/OrderBlock', json=body, headers=head)
+

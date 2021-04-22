@@ -76,6 +76,22 @@ def test_su_order(app):
         assert "\"orderNum\"" in ordering.text
 
 
+def test_edit_order_su(app):
+    blocking_order = app.order_fixture.order_block_su(head=app.token_auth_admin_user(), orderId=app.order_fixture.id_order_for_su(head=app.token_auth_admin_user()))
+    formatted_json_str = pprint.pformat(blocking_order.text)
+    print(blocking_order.request.body)
+    print(blocking_order, formatted_json_str, sep='\n\n')
+
+
+
+
+
+
+
+
+
+
+
 
 
 
