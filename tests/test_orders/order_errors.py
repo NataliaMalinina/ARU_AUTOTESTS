@@ -77,6 +77,14 @@ def test_order_without_autodest(app):
     assert "\"Невозможно определить пункт выдачи для формирования заказа\"" in ordering.text
 
 
+def test_inkorrect_id_for_delete_order(app):
+    delete_order = app.order_fixture.delete_order(orderId=parameters.autodestid_for_order, head=app.token_autorization()) #берём id любой - чтобы он не нашёлся
+    formatted_json_str = pprint.pformat(delete_order.text)
+    print(delete_order, formatted_json_str, sep='\n\n')
+    assert delete_order.status_code == 404
+    assert "\"Совпадений по указанному Id не найдено\"" in delete_order.text
+
+
 
 
 

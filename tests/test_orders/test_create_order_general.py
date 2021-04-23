@@ -5,7 +5,7 @@ from model import parameters
 
 
 def test_general_order_create(app):
-    put_the_item_in_the_cart = app.order_fixture.cart(dataset=app.order_fixture.generate_payload(3),                    #TODO надо дружиться с бд и делать выборку товаров оттуда
+    put_the_item_in_the_cart = app.order_fixture.cart(dataset=app.order_fixture.generate_payload(3),                    #TODO надо дружиться с бд и делать выборку товаров оттуда. + написать тест на удаление заказа - дергая из бд id заказа, что бы получить 400 с текстами - уже выкуплен и уже удалён
                                                       head=app.token_autorization())
     formatted_json_str = pprint.pformat(put_the_item_in_the_cart.text)
     print(put_the_item_in_the_cart.request.body)
