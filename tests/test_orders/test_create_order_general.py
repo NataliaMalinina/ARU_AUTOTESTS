@@ -1,4 +1,5 @@
 import pprint
+from json import loads
 from random import choice
 from model import parameters
 
@@ -17,7 +18,7 @@ def test_general_order_create(app):
     print(choice_autodest_before_order, formatted_json_str, sep='\n\n')
     assert choice_autodest_before_order.status_code == 200
 
-    ordering = app.order_fixture.order(email='nat19@yandex.ru', needEmail=False, needCall=False,
+    ordering = app.order_fixture.create_order(email='nat19@yandex.ru', needEmail=False, needCall=False,
                                        mnogoRuCardId=None, head=app.token_autorization())
     formatted_json_str = pprint.pformat(ordering.text)
     print(ordering.request.body)
@@ -31,7 +32,7 @@ def test_general_order_create(app):
 
 
 def test_not_auth_user_order(app):
-    ordering = app.order_fixture.order(email='nat19@yandex.ru', needEmail=False, needCall=False,
+    ordering = app.order_fixture.create_order(email='nat19@yandex.ru', needEmail=False, needCall=False,
                                        mnogoRuCardId=None, head=app.token_shadow_user())
     formatted_json_str = pprint.pformat(ordering.text)
     print(ordering.request.body)
@@ -40,12 +41,25 @@ def test_not_auth_user_order(app):
 
 
 def test_without_token_user_order(app):
-    ordering = app.order_fixture.order(email='nat19@yandex.ru', needEmail=False, needCall=False,
+    ordering = app.order_fixture.create_order(email='nat19@yandex.ru', needEmail=False, needCall=False,
                                        mnogoRuCardId=None, head=None)
     formatted_json_str = pprint.pformat(ordering.text)
     print(ordering.request.body)
     print(ordering, formatted_json_str, sep='\n\n')
     assert ordering.status_code == 401
+
+
+def test_order_cancel(app):
+    order_id = app.order_fixture.id_order_from_list(head=app.token_autorization())
+    delete_order = app.order_fixture.delete_order(orderId=order_id, head=app.token_autorization())
+    formatted_json_str = pprint.pformat(delete_order.text)
+    print(delete_order, formatted_json_str, sep='\n\n')
+    while "\"Заказ уже выкуплен.\"" in delete_order.text or "\"Заказ уже удален\"" in delete_order.text:
+        order_id = app.order_fixture.id_order_from_list(head=app.token_autorization())
+        delete_order = app.order_fixture.delete_order(orderId=order_id, head=app.token_autorization())
+        if delete_order.status_code == 200:
+            break
+    assert delete_order.status_code == 200
 
 
 def test_su_order(app):
@@ -63,7 +77,7 @@ def test_su_order(app):
     print(choice_autodest_before_order, formatted_json_str, sep='\n\n')
     assert choice_autodest_before_order.status_code == 200
 
-    ordering = app.order_fixture.order_su(email='nat19@yandex.ru', needEmail=False, needCall=False,
+    ordering = app.order_fixture.create_order_su(email='nat19@yandex.ru', needEmail=False, needCall=False,
                                        mnogoRuCardId=None, head=app.token_auth_admin_user(), userId='5ee852c50521b00001edffed')
     formatted_json_str = pprint.pformat(ordering.text)
     print(ordering.request.body)
@@ -81,6 +95,44 @@ def test_edit_order_su(app):
     formatted_json_str = pprint.pformat(blocking_order.text)
     print(blocking_order.request.body)
     print(blocking_order, formatted_json_str, sep='\n\n')
+    while blocking_order.status_code == 400 and "\"Заказ уже удален\"" in blocking_order.text:
+        blocking_order = app.order_fixture.order_block_su(head=app.token_auth_admin_user(),
+                                        orderId=app.order_fixture.id_order_for_su(head=app.token_auth_admin_user()))
+        if blocking_order.status_code == 200 or "\"Блокировка на данный заказ уже установлена\"" in blocking_order.text:
+            break
+
+    id = loads(blocking_order.request.body)['orderId']
+
+    edit_order_su = app.order_fixture.edit_order_su(head=app.token_auth_admin_user(),
+                                                    orderId=id, dataset=app.order_fixture.generate_payload(2),
+                                                    dryRun=True)
+    formatted_json_str = pprint.pformat(edit_order_su.text)
+    print(edit_order_su.request.body)
+    print(edit_order_su, formatted_json_str, sep='\n\n')
+
+    while edit_order_su.status_code == 400 and "\"Минимальная сумма заказа =\"" in edit_order_su.text:
+        edit_order_su = app.order_fixture.edit_order_su(head=app.token_auth_admin_user(),
+                                                        orderId=id, dataset=app.order_fixture.generate_payload(2),
+                                                        dryRun=True)
+
+        if edit_order_su.status_code == 200:
+            break
+
+    edit_order_su = app.order_fixture.edit_order_su(head=app.token_auth_admin_user(),
+                                                    orderId=id, dataset=app.order_fixture.generate_payload(2),
+                                                    dryRun=False)
+
+    while edit_order_su.status_code == 400 and "\"Минимальная сумма заказа =\"" in edit_order_su.text:
+        edit_order_su = app.order_fixture.edit_order_su(head=app.token_auth_admin_user(),
+                                                        orderId=id, dataset=app.order_fixture.generate_payload(2),
+                                                        dryRun=False)
+        if blocking_order.status_code == 200:
+            break
+
+    formatted_json_str = pprint.pformat(edit_order_su.text)
+    print(edit_order_su.request.body)
+    print(edit_order_su, formatted_json_str, sep='\n\n')
+
 
 
 

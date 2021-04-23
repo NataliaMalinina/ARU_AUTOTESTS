@@ -33,6 +33,19 @@ class OrdersHelper:
         body = {"items": dataset}
         return self.app._s.put(self.app.host + '/Cart', json=body, headers=head)
 
+    def delete_order(self, orderId, head):
+        query_params = {'orderId': orderId}
+        return self.app._s.delete(self.app.host + '/Order', params=query_params, headers = head)
+
+    def list_of_orders(self, head, page=0, size=50):
+        query_params = {"page": page, "size": size}
+        return self.app._s.get(self.app.host + '/Order/List', params=query_params, headers = head)
+
+    def id_order_from_list(self, head):
+        list_of_orders = loads(self.list_of_orders(head, page=0, size=50).text)
+        orderId = choice(list_of_orders['data'])['id']
+        return orderId
+
 # Для SU
 
     def cart_su(self, head, dataset, userId=None):
@@ -44,7 +57,7 @@ class OrdersHelper:
                 "mnogoRuCardId": mnogoRuCardId, "userId": userId}
         return self.app._s.put(self.app.host + '/Order', json=body, headers=head)
 
-    def list_of_orders_su(self, head, page=0, pagesize=30):
+    def list_of_orders_su(self, head, page=0, pagesize=100):
         payload = {"page": page, "pagesize": pagesize}
         return self.app._s.get(self.app.host + '/SuperUser/Orders', params=payload, headers=head)
 
@@ -56,4 +69,8 @@ class OrdersHelper:
     def order_block_su(self, head, orderId):
         body = {"orderId": orderId}
         return self.app._s.put(self.app.host + '/SuperUser/OrderBlock', json=body, headers=head)
+
+    def edit_order_su(self, head, orderId, dataset, dryRun):
+        body = {"orderId": orderId, "items": dataset, "dryRun": dryRun}
+        return self.app._s.post(self.app.host + '/SuperUser/EditOrder', json=body, headers=head)
 
