@@ -7,19 +7,26 @@ class OrdersHelper:
     def __init__(self, app):
         self.app = app                                                                                                   #self.app.wd - если нужен метод из другого класса, то вызываем его так
 
-    def generate_payload(self, cnt):
+    def generate_payload(self, cnt, deferred=False):
         dataset = []
         for i in range(cnt):
             dataset.append(
                 {'itemId': parameters.items.pop(randint(0, len(parameters.items) - 1)),
                  'amount': randint(1, 99),
-                 'deferred': False
+                 'deferred': deferred
                  })
         return dataset
 
     def cart(self, head, dataset):
         body = {"items": dataset}
         return self.app._s.put(self.app.host + '/Cart', json=body, headers=head)
+
+    # def item_in_cart(self, cart):
+    #     while i in len(cart):
+    #         i = 1
+    #         n = loads(cart.text)['items']*i
+    #         n['deffered'].replace(False, True)
+    #         i += 1
 
     def create_order(self, email, needEmail, needCall, mnogoRuCardId, head):
         body = {"email": f'{email}', "needEmail": needEmail, "needCall": needCall,
@@ -35,16 +42,21 @@ class OrdersHelper:
 
     def delete_order(self, orderId, head):
         query_params = {'orderId': orderId}
-        return self.app._s.delete(self.app.host + '/Order', params=query_params, headers = head)
+        return self.app._s.delete(self.app.host + '/Order', params=query_params, headers=head)
 
     def list_of_orders(self, head, page=0, size=50):
         query_params = {"page": page, "size": size}
-        return self.app._s.get(self.app.host + '/Order/List', params=query_params, headers = head)
+        return self.app._s.get(self.app.host + '/Order/List', params=query_params, headers=head)
 
     def id_order_from_list(self, head):
-        list_of_orders = loads(self.list_of_orders(head, page=0, size=50).text)
+        list_of_orders = loads(self.list_of_orders(head, page=0, size=100).text)
         orderId = choice(list_of_orders['data'])['id']
         return orderId
+
+    def repeat_order(self, head, orderId):
+        body = {"orderId": orderId}
+        return self.app._s.put(self.app.host + '/Order/Repeat', json=body, headers=head)
+
 
 # Для SU
 
@@ -73,4 +85,13 @@ class OrdersHelper:
     def edit_order_su(self, head, orderId, dataset, dryRun):
         body = {"orderId": orderId, "items": dataset, "dryRun": dryRun}
         return self.app._s.post(self.app.host + '/SuperUser/EditOrder', json=body, headers=head)
+
+    def delete_order_su(self, orderId, head):
+        query_params = {'orderId': orderId}
+        return self.app._s.delete(self.app.host + '/SuperUser/Order', params=query_params, headers=head)
+
+    def repeat_order_su(self, head, orderId, userId='5ee852c50521b00001edffed'):
+        body = {"orderId": orderId, 'userId': userId}
+        return self.app._s.put(self.app.host + '/Order/Repeat', json=body, headers=head)
+
 
