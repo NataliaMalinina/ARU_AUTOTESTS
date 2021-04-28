@@ -21,12 +21,9 @@ class OrdersHelper:
         body = {"items": dataset}
         return self.app._s.put(self.app.host + '/Cart', json=body, headers=head)
 
-    # def item_in_cart(self, cart):
-    #     while i in len(cart):
-    #         i = 1
-    #         n = loads(cart.text)['items']*i
-    #         n['deffered'].replace(False, True)
-    #         i += 1
+    def cart_with_deferred_items(self, head, items):
+        body = {"items": items}
+        return self.app._s.put(self.app.host + '/Cart', json=body, headers=head)
 
     def create_order(self, email, needEmail, needCall, mnogoRuCardId, head):
         body = {"email": f'{email}', "needEmail": needEmail, "needCall": needCall,

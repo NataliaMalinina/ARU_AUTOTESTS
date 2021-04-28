@@ -1,6 +1,7 @@
+import json
 import pprint
 from json import loads
-from random import choice
+from random import choice, randint
 from model import parameters
 
 
@@ -23,7 +24,7 @@ def test_general_order_create(app):
     formatted_json_str = pprint.pformat(ordering.text)
     print(ordering.request.body)
     print(ordering, formatted_json_str, sep='\n\n')
-    while ordering.status_code == 400 and "\"Минимальная сумма заказа =" in ordering.text:
+    while ordering.status_code == 400 and "\"Минимальная сумма заказа =\"" in ordering.text:
         put_the_item_in_the_cart = app.order_fixture.cart(dataset=app.order_fixture.generate_payload(3),
                                                           head=app.token_autorization())
         assert "\"tradeName\"" in put_the_item_in_the_cart.text
@@ -69,13 +70,26 @@ def test_order_repeat(app):
 
 
 def test_take_from_deferred(app):
-    deffered_item = app.order_fixture.cart(dataset=app.order_fixture.generate_payload(3, True),
+    json_deferred_item_true = app.order_fixture.cart(dataset=app.order_fixture.generate_payload(2, True),
                                                       head=app.token_autorization())
-    formatted_json_str = pprint.pformat(deffered_item.text)
-    print(deffered_item.request.body)
-    print(deffered_item, formatted_json_str, sep='\n\n')
-    assert "\"tradeName\"" in deffered_item.text
-    assert deffered_item.status_code == 200
+    formatted_json_str = pprint.pformat(json_deferred_item_true .text)
+    print(json_deferred_item_true.request.body)
+    print(json_deferred_item_true, formatted_json_str, sep='\n\n')
+    assert "\"tradeName\"" in json_deferred_item_true.text
+    assert json_deferred_item_true.status_code == 200
+
+    replace_deferred_items = loads(json_deferred_item_true.request.body)['items']
+    for item in replace_deferred_items:
+        item['deferred'] = False
+
+
+    put_the_item_in_the_cart = app.order_fixture.cart_with_deferred_items(items=replace_deferred_items,
+                                                                          head=app.token_autorization())
+    formatted_json_str = pprint.pformat(put_the_item_in_the_cart.text)
+    print(put_the_item_in_the_cart.request.body)
+    print(put_the_item_in_the_cart, formatted_json_str, sep='\n\n')
+    assert "\"tradeName\"" in put_the_item_in_the_cart.text
+    assert put_the_item_in_the_cart.status_code == 200
 
     choice_autodest_before_order = app.choice_autodest_auth_user(id=choice(parameters.autodestid_for_order),
                                                                  head=app.token_autorization())
@@ -83,25 +97,26 @@ def test_take_from_deferred(app):
     print(choice_autodest_before_order, formatted_json_str, sep='\n\n')
     assert choice_autodest_before_order.status_code == 200
 
-    put_the_item_in_cart = app.order_fixture.cart(dataset=app.order_fixture.item_in_cart(cart=app.order_fixture.cart(head=app.token_autorization(), dataset=deffered_item)), head=app.token_autorization())
-
     ordering = app.order_fixture.create_order(email='nat19@yandex.ru', needEmail=False, needCall=False,
                                               mnogoRuCardId=None, head=app.token_autorization())
-    formatted_json_str = pprint.pformat(ordering.text)
-    print(ordering.request.body)
-    print(ordering, formatted_json_str, sep='\n\n')
+
     while ordering.status_code == 400 and "\"Минимальная сумма заказа =\"" in ordering.text:
-        deffered_item = app.order_fixture.cart(dataset=app.order_fixture.generate_payload(3, True),
+        put_the_item_in_the_cart = app.order_fixture.cart(dataset=app.order_fixture.generate_payload(3),
                                                           head=app.token_autorization())
-        assert "\"tradeName\"" in deffered_item.text
-        assert deffered_item.status_code == 200
+        assert "\"tradeName\"" in put_the_item_in_the_cart.text
+        assert put_the_item_in_the_cart.status_code == 200
         ordering = app.order_fixture.create_order(email='nat19@yandex.ru', needEmail=False, needCall=False,
                                                   mnogoRuCardId=None, head=app.token_autorization())
         print(ordering, formatted_json_str, sep='\n\n')
         if ordering.status_code == 200:
             break
+
     assert "\"orderId\"" in ordering.text
     assert "\"orderNum\"" in ordering.text
+    formatted_json_str = pprint.pformat(ordering.text)
+    print(ordering.request.body)
+    print(ordering, formatted_json_str, sep='\n\n')
+
 
 # SU
 
