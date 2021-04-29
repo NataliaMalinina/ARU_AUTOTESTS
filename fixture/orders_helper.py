@@ -17,17 +17,17 @@ class OrdersHelper:
                  })
         return dataset
 
-    def cart(self, head, dataset):
-        body = {"items": dataset}
+    def cart(self, head, dataset, userId=None):
+        body = {"items": dataset, "userId": userId}
         return self.app._s.put(self.app.host + '/Cart', json=body, headers=head)
 
     def cart_with_deferred_items(self, head, items):
         body = {"items": items}
         return self.app._s.put(self.app.host + '/Cart', json=body, headers=head)
 
-    def create_order(self, email, needEmail, needCall, mnogoRuCardId, head):
+    def create_order(self, email, needEmail, needCall, mnogoRuCardId, head, userId=None):
         body = {"email": f'{email}', "needEmail": needEmail, "needCall": needCall,
-                "mnogoRuCardId": mnogoRuCardId}
+                "mnogoRuCardId": mnogoRuCardId, "userId": userId}
         return self.app._s.put(self.app.host + '/Order', json=body, headers=head)
 
     def dataset_min_sum(self, head):
@@ -50,21 +50,12 @@ class OrdersHelper:
         orderId = choice(list_of_orders['data'])['id']
         return orderId
 
-    def repeat_order(self, head, orderId):
-        body = {"orderId": orderId}
+    def repeat_order(self, head, orderId, userId=None):
+        body = {"orderId": orderId, 'userId': userId}
         return self.app._s.put(self.app.host + '/Order/Repeat', json=body, headers=head)
 
 
 # Для SU
-
-    def cart_su(self, head, dataset, userId=None):
-        body = {"items": dataset, "userId": userId}
-        return self.app._s.put(self.app.host + '/Cart', json=body, headers=head)
-
-    def create_order_su(self, email, needEmail, needCall, mnogoRuCardId, head, userId=None):
-        body = {"email": email, "needEmail": needEmail, "needCall": needCall,
-                "mnogoRuCardId": mnogoRuCardId, "userId": userId}
-        return self.app._s.put(self.app.host + '/Order', json=body, headers=head)
 
     def list_of_orders_su(self, head, page=0, pagesize=100):
         payload = {"page": page, "pagesize": pagesize}
@@ -87,8 +78,8 @@ class OrdersHelper:
         query_params = {'orderId': orderId}
         return self.app._s.delete(self.app.host + '/SuperUser/Order', params=query_params, headers=head)
 
-    def repeat_order_su(self, head, orderId, userId='5ee852c50521b00001edffed'):
-        body = {"orderId": orderId, 'userId': userId}
-        return self.app._s.put(self.app.host + '/Order/Repeat', json=body, headers=head)
+    # def repeat_order_su(self, head, orderId, userId='5ee852c50521b00001edffed'):
+    #     body = {"orderId": orderId, 'userId': userId}
+    #     return self.app._s.put(self.app.host + '/Order/Repeat', json=body, headers=head)
 
 
