@@ -111,7 +111,7 @@ def test_duplicate_order(app):
         'deferred': False
     }]
 
-    put_the_item_in_the_cart = app.order_fixture.cart(dataset=dataset,                                                  #ПОКА ЗАХАРДКОДИЛА ДАННЫЕ ТОВАРОВ И АПТЕК, ТАК КАК НА ТЕХЕ КАКАЯ-ТО ХЕРНЯ ТВОРИТЬСЯ ТОВАРЫ ДОБАВЛЯЮТСЯ И ТУТ ЖЕ СТАНОВЯТСЯ НЕ В НАЛИЧИИ ИЛИ ЦЕНА МЕНЯЕТСЯ app.order_fixture.generate_payload(3),
+    put_the_item_in_the_cart = app.order_fixture.cart(dataset=dataset,                                                  #ПОКА ЗАХАРДКОДИЛА ДАННЫЕ ТОВАРОВ И АПТЕК, ТАК КАК НА ТЕХЕ КАКАЯ-ТО ХЕРНЯ ТВОРИТСЯ ТОВАРЫ ДОБАВЛЯЮТСЯ И ТУТ ЖЕ СТАНОВЯТСЯ НЕ В НАЛИЧИИ ИЛИ ЦЕНА МЕНЯЕТСЯ app.order_fixture.generate_payload(3),
                                                       head=app.token_autorization())
     formatted_json_str = pprint.pformat(put_the_item_in_the_cart.text)
     print(put_the_item_in_the_cart.request.body)
@@ -159,6 +159,29 @@ def test_duplicate_order(app):
 
     assert id_from_response == id_from_response_2
 
+
+def test_incorrect_number_mnoro_ru(app):
+    put_the_item_in_the_cart = app.order_fixture.cart(dataset=app.order_fixture.generate_payload(3),
+                                                      head=app.token_autorization())
+    formatted_json_str = pprint.pformat(put_the_item_in_the_cart.text)
+    print(put_the_item_in_the_cart.request.body)
+    print(put_the_item_in_the_cart, formatted_json_str, sep='\n\n')
+    assert "\"tradeName\"" in put_the_item_in_the_cart.text
+    assert put_the_item_in_the_cart.status_code == 200
+
+    choice_autodest_before_order = app.choice_autodest_auth_user(id=choice(parameters.autodestid_for_order),
+                                                                 head=app.token_autorization())
+    print(choice_autodest_before_order.request.body)
+    print(choice_autodest_before_order, formatted_json_str, sep='\n\n')
+    assert choice_autodest_before_order.status_code == 200
+
+    ordering = app.order_fixture.create_order(email='nat19@yandex.ru', needEmail=False, needCall=False,
+                                              mnogoRuCardId='1234567890123', head=app.token_autorization())
+    formatted_json_str = pprint.pformat(ordering.text)
+    print(ordering.request.body)
+    print(ordering, formatted_json_str, sep='\n\n')
+    assert "\"Номер карты Много.Ру должен состоять из восьми цифр\"" in ordering.text
+    assert ordering.status_code == 400
 
 
 
