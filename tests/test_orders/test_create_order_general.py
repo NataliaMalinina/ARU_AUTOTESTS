@@ -23,7 +23,7 @@ def test_general_order_create(app):
     formatted_json_str = pprint.pformat(ordering.text)
     print(ordering.request.body)
     print(ordering, formatted_json_str, sep='\n\n')
-    while ordering.status_code == 400 and "\"Минимальная сумма заказа =\"" in ordering.text:
+    while ordering.status_code == 400 and "\"Минимальная сумма заказа =" in ordering.text:
         put_the_item_in_the_cart = app.order_fixture.cart(dataset=app.order_fixture.generate_payload(3),
                                                           head=app.token_autorization())
         assert "\"tradeName\"" in put_the_item_in_the_cart.text
@@ -81,7 +81,6 @@ def test_take_from_deferred(app):
     for item in replace_deferred_items:
         item['deferred'] = False
 
-
     put_the_item_in_the_cart = app.order_fixture.cart_with_deferred_items(items=replace_deferred_items,
                                                                           head=app.token_autorization())
     formatted_json_str = pprint.pformat(put_the_item_in_the_cart.text)
@@ -99,7 +98,7 @@ def test_take_from_deferred(app):
     ordering = app.order_fixture.create_order(email='nat19@yandex.ru', needEmail=False, needCall=False,
                                               mnogoRuCardId=None, head=app.token_autorization())
 
-    while ordering.status_code == 400 and "\"Минимальная сумма заказа =\"" in ordering.text:
+    while ordering.status_code == 400 and "\"Минимальная сумма заказа =" in ordering.text:
         put_the_item_in_the_cart = app.order_fixture.cart(dataset=app.order_fixture.generate_payload(3),
                                                           head=app.token_autorization())
         assert "\"tradeName\"" in put_the_item_in_the_cart.text
@@ -137,7 +136,7 @@ def test_order_with_mnogo_ru(app):
     print(ordering.request.body)
     print(ordering, formatted_json_str, sep='\n\n')
 
-    while ordering.status_code == 400 and "\"Минимальная сумма заказа =\"" in ordering.text:
+    while ordering.status_code == 400 and "\"Минимальная сумма заказа =" in ordering.text:
         put_the_item_in_the_cart = app.order_fixture.cart(dataset=app.order_fixture.generate_payload(3),
                                                           head=app.token_autorization())
         assert "\"tradeName\"" in put_the_item_in_the_cart.text
@@ -150,6 +149,7 @@ def test_order_with_mnogo_ru(app):
     assert "\"orderId\"" in ordering.text
     assert "\"orderNum\"" in ordering.text
     assert "\"MnogoRu\"" in ordering.text
+
 
 # SU
 
@@ -177,7 +177,7 @@ def test_su_order(app):
     formatted_json_str = pprint.pformat(ordering.text)
     print(ordering.request.body)
     print(ordering, formatted_json_str, sep='\n\n')
-    while ordering.status_code == 400 and "\"Минимальная сумма заказа =\"" in ordering.text:
+    while ordering.status_code == 400 and "\"Минимальная сумма заказа =" in ordering.text:
         put_the_item_in_the_cart = app.order_fixture.cart(dataset=app.order_fixture.generate_payload(3),
                                                           head=app.token_autorization(),
                                                           serId='5ee852c50521b00001edffed')
@@ -214,7 +214,7 @@ def test_edit_order_su(app):
     print(edit_order_su.request.body)
     print(edit_order_su, formatted_json_str, sep='\n\n')
 
-    while edit_order_su.status_code == 400 and "\"Минимальная сумма заказа =\"" in edit_order_su.text:
+    while edit_order_su.status_code == 400 and "\"Минимальная сумма заказа =" in edit_order_su.text:
         edit_order_su = app.order_fixture.edit_order_su(head=app.token_auth_admin_user(),
                                                         orderId=id, dataset=app.order_fixture.generate_payload(2),
                                                         dryRun=True)
@@ -226,7 +226,7 @@ def test_edit_order_su(app):
                                                     orderId=id, dataset=app.order_fixture.generate_payload(2),
                                                     dryRun=False)
 
-    while edit_order_su.status_code == 400 and "\"Минимальная сумма заказа =\"" in edit_order_su.text:
+    while edit_order_su.status_code == 400 and "\"Минимальная сумма заказа =" in edit_order_su.text:
         edit_order_su = app.order_fixture.edit_order_su(head=app.token_auth_admin_user(),
                                                         orderId=id, dataset=app.order_fixture.generate_payload(2),
                                                         dryRun=False)
@@ -262,7 +262,7 @@ def test_order_repeat_su(app):
     print(ordering.request.body)
     print(ordering, formatted_json_str, sep='\n\n')
 
-    while "\"Минимальная сумма заказа =\"" in ordering.text:
+    while "\"Минимальная сумма заказа =" in ordering.text:
         put_the_item_in_the_cart = app.order_fixture.cart(dataset=app.order_fixture.generate_payload(2),
                                                           head=app.token_autorization())
         ordering2 = app.order_fixture.create_order(email='nat19@yandex.ru', needEmail=False, needCall=False, mnogoRuCardId=None,

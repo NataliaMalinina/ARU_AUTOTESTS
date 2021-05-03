@@ -81,8 +81,8 @@ class Application:
         data = {"id": f'{id}'}
         return self._s.put(self.host + '/AutoDest/UserAutoDest', json=data, headers=head)
 
-    def choice_autodest_su(self, id, userid, head):
-        data = {"id": f'{id}', "userId": f'{userid}'}
+    def choice_autodest_su(self, id, userId, head):
+        data = {"id": f'{id}', "userId": f'{userId}'}
         return self._s.put(self.host + '/AutoDest/UserAutoDest', json=data, headers=head)
 
     def autodest_info(self, autoDestId):

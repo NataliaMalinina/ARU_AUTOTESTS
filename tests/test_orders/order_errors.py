@@ -1,6 +1,6 @@
 import pprint
 from json import loads
-from random import choice, randint
+from random import choice, randrange
 from model import parameters
 
 
@@ -22,8 +22,7 @@ def test_min_sum_failed(app):                                                   
     formatted_json_str = pprint.pformat(ordering.text)
     print(ordering.request.body)
     print(ordering, formatted_json_str, sep='\n\n')
-    assert "\"Минимальная сумма заказа =" in ordering.text
-    assert ordering.status_code == 400
+    assert "\"Минимальная сумма заказа =" in ordering.text and ordering.status_code == 400
 
 
 def test_not_auth_user_order(app):
@@ -182,6 +181,7 @@ def test_incorrect_number_mnoro_ru(app):
     print(ordering, formatted_json_str, sep='\n\n')
     assert "\"Номер карты Много.Ру должен состоять из восьми цифр\"" in ordering.text
     assert ordering.status_code == 400
+
 
 
 
