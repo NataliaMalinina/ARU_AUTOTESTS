@@ -18,7 +18,7 @@ class Application:
         data = {"type": "BySms", "code": f'{code}', "phone": f'{phone}', "timeZone": 0, "referalId": None}
         return self._s.post(self.host + '/Auth/Auth', json=data)
 
-    def auth_admin_user(self):
+    def auth_super_user(self):
         data = {"userName": "MNS", "password": "Prokhorova23"}
         return self._s.post(self.host + '/AdminUser/Auth', json=data)
 
@@ -29,13 +29,13 @@ class Application:
         head = {'Authorization': f"Bearer {authorization['token']}"}
         return head
 
-    def token_auth_admin_user(self):
-        authorization = loads(self.auth_admin_user().text)
+    def token_auth_super_user(self):
+        authorization = loads(self.auth_super_user().text)
         head = {'Authorization': f"Bearer {authorization['token']}"}
         return head
 
     def token_shadow_user(self):
-        authorization = self.choice_city(id='5e574663f4d315000196b176', manualChange=True).headers
+        authorization = self.choice_city_shadow_user(id='5e574663f4d315000196b176', manualChange=True).headers
         head = {'Authorization': f"Bearer {authorization['X-Shadowuser']}"}
         return head
 
@@ -59,16 +59,16 @@ class Application:
 
 # Выбор города
 
-    def choice_city(self, id, manualChange):
+    def choice_city_shadow_user(self, id, manualChange):
         data = {"id": id, "manualChange": manualChange}
         return self._s.put(self.host + '/City/UserCity', json=data)
 
-    def choice_city_admin(self, id, manualChange, userid, head):
-        data = {"id": f'{id}', "manualChange": manualChange, "userId": userid}
-        return self._s.put(self.host + '/City/UserCity', json=data, headers=head)
+     #def choice_city_admin(self, id, manualChange, userid, head):
+    #     data = {"id": f'{id}', "manualChange": manualChange, "userId": userid}
+    #     return self._s.put(self.host + '/City/UserCity', json=data, headers=head)
 
-    def choice_city_auth_user(self, id, manualChange, head):
-        data = {"id": f'{id}', "manualChange": manualChange}
+    def choice_city(self, id, manualChange, head, userId = None):
+        data = {"id": f'{id}', "manualChange": manualChange, "userId": userId}
         return self._s.put(self.host + '/City/UserCity', json=data, headers=head)
 
 # Выбор аптеки

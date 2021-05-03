@@ -76,13 +76,13 @@ def test_order_without_autodest(app):
     assert "\"tradeName\"" in put_the_item_in_the_cart.text
     assert put_the_item_in_the_cart.status_code == 200
 
-    choice_city = app.choice_city_auth_user(id='5e56f692524b5400014ace3f', manualChange=True,
-                                            head=app.token_autorization())
+    choice_city = app.choice_city(id='5e56f692524b5400014ace3f', manualChange=True,
+                                  head=app.token_autorization())
     assert choice_city.status_code == 200
     assert '{"id":' in choice_city.text
 
-    choice_city = app.choice_city_auth_user(id='5e574686defa1e000131b5df', manualChange=True,
-                                            head=app.token_autorization())
+    choice_city = app.choice_city(id='5e574686defa1e000131b5df', manualChange=True,
+                                  head=app.token_autorization())
     assert choice_city.status_code == 200
     assert '{"id":' in choice_city.text
 

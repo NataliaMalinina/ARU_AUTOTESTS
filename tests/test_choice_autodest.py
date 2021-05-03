@@ -115,7 +115,7 @@ def test_choice_autodest_without_mark_with_beznal_auth_user(app):
 
 def test_choice_autodest_su(app):
     choice_autodest = app.choice_autodest_su(id=parameters.select_autodest(),
-                                             userid='5ee852c50521b00001edffed', head=app.token_auth_admin_user())
+                                             userid='5ee852c50521b00001edffed', head=app.token_auth_super_user())
     formatted_json_str = pprint.pformat(choice_autodest.text)
     print(choice_autodest.request.body)
     print(choice_autodest.url, formatted_json_str, sep='\n\n')

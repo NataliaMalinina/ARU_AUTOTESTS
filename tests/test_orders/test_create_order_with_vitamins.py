@@ -191,7 +191,7 @@ def test_order_with_vitamins_but_min_summ_failed(app):
 
 
 def test_add_vitamins_to_user(app):
-    add_vitamins = app.order_fixture.actions_with_vitamins(userId='5ee852c50521b00001edffed', head=app.token_auth_admin_user(),
+    add_vitamins = app.order_fixture.actions_with_vitamins(userId='5ee852c50521b00001edffed', head=app.token_auth_super_user(),
                                                            value=100, updatingType='Credit')
 
     formatted_json_str = pprint.pformat(add_vitamins.text)
@@ -202,16 +202,16 @@ def test_add_vitamins_to_user(app):
 
 
 def test_remove_vitamins_from_user(app):
-    remove_vitamins = app.order_fixture.actions_with_vitamins(userId='5ee852c50521b00001edffed', head=app.token_auth_admin_user(),
-                                                           value=20, updatingType='Debit')
+    remove_vitamins = app.order_fixture.actions_with_vitamins(userId='5ee852c50521b00001edffed', head=app.token_auth_super_user(),
+                                                              value=20, updatingType='Debit')
     if remove_vitamins.status_code == 409 and "\"Запрошенная сумма списания больше текущего баланса пользователя\"" in remove_vitamins.text:
-        add_vitamins = app.order_fixture.actions_with_vitamins(userId='5ee852c50521b00001edffed', head=app.token_auth_admin_user(),
-                                                           value=20, updatingType='Credit')
+        add_vitamins = app.order_fixture.actions_with_vitamins(userId='5ee852c50521b00001edffed', head=app.token_auth_super_user(),
+                                                               value=20, updatingType='Credit')
         assert add_vitamins.status_code == 200
         assert add_vitamins.text.isdigit()
 
-        remove_vitamins = app.order_fixture.actions_with_vitamins(userId='5ee852c50521b00001edffed', head=app.token_auth_admin_user(),
-                                                           value=1, updatingType='Debit')
+        remove_vitamins = app.order_fixture.actions_with_vitamins(userId='5ee852c50521b00001edffed', head=app.token_auth_super_user(),
+                                                                  value=1, updatingType='Debit')
 
     formatted_json_str = pprint.pformat(remove_vitamins.text)
     print(remove_vitamins.request.body)
@@ -222,7 +222,7 @@ def test_remove_vitamins_from_user(app):
 
 def test_create_order_with_vitamins_su(app):
     put_the_item_in_the_cart = app.order_fixture.cart(dataset=app.order_fixture.generate_payload(2),
-                                                      head=app.token_auth_admin_user(), userId='5ee852c50521b00001edffed')
+                                                      head=app.token_auth_super_user(), userId='5ee852c50521b00001edffed')
     formatted_json_str = pprint.pformat(put_the_item_in_the_cart.text)
     print(put_the_item_in_the_cart.request.body)
     print(put_the_item_in_the_cart, formatted_json_str, sep='\n\n')
@@ -230,39 +230,39 @@ def test_create_order_with_vitamins_su(app):
     assert put_the_item_in_the_cart.status_code == 200
 
     use_vitamins = app.order_fixture.cart_use_vitamins(vitaminsCount=randrange(20, 100, 10),
-                                                       head=app.token_auth_admin_user(), userId='5ee852c50521b00001edffed')
+                                                       head=app.token_auth_super_user(), userId='5ee852c50521b00001edffed')
     try:
         assert loads(use_vitamins.text)['vitaminsInfo']["vitaminsUsed"] > 0
     except AssertionError:
         test_add_vitamins_to_user(app)
         use_vitamins = app.order_fixture.cart_use_vitamins(vitaminsCount=randrange(20, 100, 10),
-                                                       head=app.token_auth_admin_user(), userId='5ee852c50521b00001edffed')
+                                                           head=app.token_auth_super_user(), userId='5ee852c50521b00001edffed')
 
     choice_autodest_before_order = app.choice_autodest_su(id=choice(parameters.autodestid_for_order),
-                                                        head=app.token_auth_admin_user(), userId='5ee852c50521b00001edffed')
+                                                          head=app.token_auth_super_user(), userId='5ee852c50521b00001edffed')
     print(choice_autodest_before_order.request.body)
     print(choice_autodest_before_order, formatted_json_str, sep='\n\n')
     assert choice_autodest_before_order.status_code == 200
 
     ordering = app.order_fixture.create_order(email=None, needEmail=False, needCall=False, mnogoRuCardId=None,
-                                              head=app.token_auth_admin_user(), userId='5ee852c50521b00001edffed')
+                                              head=app.token_auth_super_user(), userId='5ee852c50521b00001edffed')
     formatted_json_str = pprint.pformat(ordering.text)
     print(ordering.request.body)
     print(ordering, formatted_json_str, sep='\n\n')
 
     while ordering.status_code == 400 and "\"Минимальная сумма заказа =\"" in ordering.text:
         put_the_item_in_the_cart = app.order_fixture.cart(dataset=app.order_fixture.generate_payload(3),
-                                                          head=app.token_auth_admin_user(),
+                                                          head=app.token_auth_super_user(),
                                                           userId='5ee852c50521b00001edffed')
         assert "\"tradeName\"" in put_the_item_in_the_cart.text
         assert put_the_item_in_the_cart.status_code == 200
 
         use_vitamins = app.order_fixture.cart_use_vitamins(vitaminsCount=randrange(20, 100, 10),
-                                                           head=app.token_auth_admin_user(),
+                                                           head=app.token_auth_super_user(),
                                                            userId='5ee852c50521b00001edffed')
 
         ordering = app.order_fixture.create_order(email=None, needEmail=False, needCall=False, mnogoRuCardId=None,
-                                                  head=app.token_auth_admin_user(),
+                                                  head=app.token_auth_super_user(),
                                                   userId='5ee852c50521b00001edffed')
         print(ordering, formatted_json_str, sep='\n\n')
         if ordering.status_code == 200:
