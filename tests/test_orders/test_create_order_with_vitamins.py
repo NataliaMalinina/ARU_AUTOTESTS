@@ -24,8 +24,8 @@ def test_create_order_with_vitamins(app):
         use_vitamins = app.order_fixture.cart_use_vitamins(vitaminsCount=randrange(20, 100, 10),
                                                            head=app.token_autorization())
 
-    choice_autodest_before_order = app.choice_autodest_auth_user(id=choice(parameters.autodestid_for_order),
-                                                                 head=app.token_autorization())
+    choice_autodest_before_order = app.choice_autodest(id=choice(parameters.autodestid_for_order),
+                                                       head=app.token_autorization())
     print(choice_autodest_before_order.request.body)
     print(choice_autodest_before_order, formatted_json_str, sep='\n\n')
     assert choice_autodest_before_order.status_code == 200
@@ -69,8 +69,8 @@ def test_create_order_with_invalid_count_vitamins(app):
 
     assert loads(use_vitamins.text)['vitaminsInfo']["vitaminsUsed"] == 0
 
-    choice_autodest_before_order = app.choice_autodest_auth_user(id=choice(parameters.autodestid_for_order),
-                                                                 head=app.token_autorization())
+    choice_autodest_before_order = app.choice_autodest(id=choice(parameters.autodestid_for_order),
+                                                       head=app.token_autorization())
     print(choice_autodest_before_order.request.body)
     print(choice_autodest_before_order, formatted_json_str, sep='\n\n')
     assert choice_autodest_before_order.status_code == 200
@@ -114,8 +114,8 @@ def test_create_order_with_invalid_count_vitamins_overrange(app):
 
     assert loads(use_vitamins.text)['vitaminsInfo']["vitaminsUsed"] > 0
 
-    choice_autodest_before_order = app.choice_autodest_auth_user(id=choice(parameters.autodestid_for_order),
-                                                                 head=app.token_autorization())
+    choice_autodest_before_order = app.choice_autodest(id=choice(parameters.autodestid_for_order),
+                                                       head=app.token_autorization())
     print(choice_autodest_before_order.request.body)
     print(choice_autodest_before_order, formatted_json_str, sep='\n\n')
     assert choice_autodest_before_order.status_code == 200
@@ -173,8 +173,8 @@ def test_order_with_vitamins_but_min_summ_failed(app):
 
     assert loads(use_vitamins.text)['vitaminsInfo']["vitaminsUsed"] > 0
 
-    choice_autodest_before_order = app.choice_autodest_auth_user(id=choice(parameters.autodestid_for_order),
-                                                                  head=app.token_autorization())
+    choice_autodest_before_order = app.choice_autodest(id=choice(parameters.autodestid_for_order),
+                                                       head=app.token_autorization())
     print(choice_autodest_before_order.request.body)
     print(choice_autodest_before_order, formatted_json_str, sep='\n\n')
     assert choice_autodest_before_order.status_code == 200
@@ -238,8 +238,8 @@ def test_create_order_with_vitamins_su(app):
         use_vitamins = app.order_fixture.cart_use_vitamins(vitaminsCount=randrange(20, 100, 10),
                                                            head=app.token_auth_super_user(), userId='5ee852c50521b00001edffed')
 
-    choice_autodest_before_order = app.choice_autodest_su(id=choice(parameters.autodestid_for_order),
-                                                          head=app.token_auth_super_user(), userId='5ee852c50521b00001edffed')
+    choice_autodest_before_order = app.choice_autodest(id=choice(parameters.autodestid_for_order),
+                                                            head=app.token_auth_super_user(), userId='5ee852c50521b00001edffed')
     print(choice_autodest_before_order.request.body)
     print(choice_autodest_before_order, formatted_json_str, sep='\n\n')
     assert choice_autodest_before_order.status_code == 200

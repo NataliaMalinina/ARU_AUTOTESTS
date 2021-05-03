@@ -12,7 +12,7 @@ def test_choice_city(app):
     formatted_json_str = pprint.pformat(choice_city.text)
     print(choice_city.url, formatted_json_str, sep='\n\n')
     if cityid == '5e574663b1585900015ed444':
-        assert "Указан некорректный Id города (Parameter \'cityId\')" in choice_city.text
+        assert "\"Указан некорректный Id города (Parameter \'cityId\')\"" in choice_city.text
     else:
         assert choice_city.status_code == 200
 

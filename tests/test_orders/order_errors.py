@@ -12,7 +12,7 @@ def test_min_sum_failed(app):                                                   
     assert "\"tradeName\"" in put_the_item_in_the_cart.text
     assert put_the_item_in_the_cart.status_code == 200
 
-    choice_autodest_before_order = app.choice_autodest_auth_user(id=choice(parameters.autodestid_for_order), head=app.token_autorization())
+    choice_autodest_before_order = app.choice_autodest(id=choice(parameters.autodestid_for_order), head=app.token_autorization())
     print(choice_autodest_before_order.request.body)
     print(choice_autodest_before_order, formatted_json_str, sep='\n\n')
     assert choice_autodest_before_order.status_code == 200
@@ -52,8 +52,8 @@ def test_order_autodest_false(app):
     assert "\"tradeName\"" in put_the_item_in_the_cart.text
     assert put_the_item_in_the_cart.status_code == 200
 
-    choice_autodest_before_order = app.choice_autodest_auth_user(id=choice(parameters.not_active_autodest),
-                                                                 head=app.token_autorization())
+    choice_autodest_before_order = app.choice_autodest(id=choice(parameters.not_active_autodest),
+                                                       head=app.token_autorization())
     print(choice_autodest_before_order.request.body)
     print(choice_autodest_before_order, formatted_json_str, sep='\n\n')
     assert choice_autodest_before_order.status_code == 404
@@ -118,8 +118,8 @@ def test_duplicate_order(app):
     assert "\"tradeName\"" in put_the_item_in_the_cart.text
     assert put_the_item_in_the_cart.status_code == 200
 
-    choice_autodest_before_order = app.choice_autodest_auth_user(id='5d654e1e26306f000138a750',
-                                                                 head=app.token_autorization())
+    choice_autodest_before_order = app.choice_autodest(id='5d654e1e26306f000138a750',
+                                                       head=app.token_autorization())
     print(choice_autodest_before_order.request.body)
     print(choice_autodest_before_order, formatted_json_str, sep='\n\n')
     assert choice_autodest_before_order.status_code == 200
@@ -168,8 +168,8 @@ def test_incorrect_number_mnoro_ru(app):
     assert "\"tradeName\"" in put_the_item_in_the_cart.text
     assert put_the_item_in_the_cart.status_code == 200
 
-    choice_autodest_before_order = app.choice_autodest_auth_user(id=choice(parameters.autodestid_for_order),
-                                                                 head=app.token_autorization())
+    choice_autodest_before_order = app.choice_autodest(id=choice(parameters.autodestid_for_order),
+                                                       head=app.token_autorization())
     print(choice_autodest_before_order.request.body)
     print(choice_autodest_before_order, formatted_json_str, sep='\n\n')
     assert choice_autodest_before_order.status_code == 200

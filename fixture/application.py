@@ -63,27 +63,23 @@ class Application:
         data = {"id": id, "manualChange": manualChange}
         return self._s.put(self.host + '/City/UserCity', json=data)
 
-     #def choice_city_admin(self, id, manualChange, userid, head):
-    #     data = {"id": f'{id}', "manualChange": manualChange, "userId": userid}
-    #     return self._s.put(self.host + '/City/UserCity', json=data, headers=head)
-
     def choice_city(self, id, manualChange, head, userId = None):
         data = {"id": f'{id}', "manualChange": manualChange, "userId": userId}
         return self._s.put(self.host + '/City/UserCity', json=data, headers=head)
 
 # Выбор аптеки
 
-    def choice_autodest(self, id):
+    def choice_autodest_shadow_user(self, id):
         data = {"id": f'{id}'}
         return self._s.put(self.host + '/AutoDest/UserAutoDest', json=data)
 
-    def choice_autodest_auth_user(self, id, head):
-        data = {"id": f'{id}'}
+    def choice_autodest(self, id, head, userId = None):
+        data = {"id": f'{id}', "userId": userId}
         return self._s.put(self.host + '/AutoDest/UserAutoDest', json=data, headers=head)
 
-    def choice_autodest_su(self, id, userId, head):
-        data = {"id": f'{id}', "userId": f'{userId}'}
-        return self._s.put(self.host + '/AutoDest/UserAutoDest', json=data, headers=head)
+    # def choice_autodest_su(self, id, userId, head):
+    #     data = {"id": f'{id}', "userId": f'{userId}'}
+    #     return self._s.put(self.host + '/AutoDest/UserAutoDest', json=data, headers=head)
 
     def autodest_info(self, autoDestId):
         parameters = {"autoDestId": f'{autoDestId}'}
