@@ -11,6 +11,11 @@ def test_create_order_with_vitamins(app):
     formatted_json_str = pprint.pformat(put_the_item_in_the_cart.text)
     print(put_the_item_in_the_cart.request.body)
     print(put_the_item_in_the_cart, formatted_json_str, sep='\n\n')
+    while loads(put_the_item_in_the_cart.text)['totalSum'] < 500:
+        put_the_item_in_the_cart = app.order_fixture.cart \
+            (dataset=app.order_fixture.generate_payload(2), head=app.token_autorization())
+        if loads(put_the_item_in_the_cart.text)['totalSum'] >= 500:
+            break
     assert "\"tradeName\"" in put_the_item_in_the_cart.text
     assert put_the_item_in_the_cart.status_code == 200
 
@@ -34,21 +39,6 @@ def test_create_order_with_vitamins(app):
     formatted_json_str = pprint.pformat(ordering.text)
     print(ordering.request.body)
     print(ordering, formatted_json_str, sep='\n\n')
-
-    while ordering.status_code == 400 and "\"Минимальная сумма заказа =" in ordering.text:
-        put_the_item_in_the_cart = app.order_fixture.cart(dataset=app.order_fixture.generate_payload(3),
-                                                          head=app.token_autorization())
-        assert "\"tradeName\"" in put_the_item_in_the_cart.text
-        assert put_the_item_in_the_cart.status_code == 200
-
-        use_vitamins = app.order_fixture.cart_use_vitamins(vitaminsCount=randrange(20, 100, 10),
-                                                           head=app.token_autorization())
-
-        ordering = app.order_fixture.create_order(email=None, needEmail=False, needCall=False, mnogoRuCardId=None,
-                                              head=app.token_autorization())
-        print(ordering, formatted_json_str, sep='\n\n')
-        if ordering.status_code == 200:
-            break
     assert "\"orderId\"" in ordering.text
     assert "\"orderNum\"" in ordering.text
     assert loads(ordering.text)['order']['vitaminsUsed'] > 0
@@ -60,6 +50,11 @@ def test_create_order_with_invalid_count_vitamins(app):
     formatted_json_str = pprint.pformat(put_the_item_in_the_cart.text)
     print(put_the_item_in_the_cart.request.body)
     print(put_the_item_in_the_cart, formatted_json_str, sep='\n\n')
+    while loads(put_the_item_in_the_cart.text)['totalSum'] < 500:
+        put_the_item_in_the_cart = app.order_fixture.cart \
+            (dataset=app.order_fixture.generate_payload(2), head=app.token_autorization())
+        if loads(put_the_item_in_the_cart.text)['totalSum'] >= 500:
+            break
     assert "\"tradeName\"" in put_the_item_in_the_cart.text
     assert put_the_item_in_the_cart.status_code == 200
 
@@ -80,20 +75,6 @@ def test_create_order_with_invalid_count_vitamins(app):
     print(ordering.request.body)
     print(ordering, formatted_json_str, sep='\n\n')
 
-    while ordering.status_code == 400 and "\"Минимальная сумма заказа =" in ordering.text:
-        put_the_item_in_the_cart = app.order_fixture.cart(dataset=app.order_fixture.generate_payload(3),
-                                                          head=app.token_autorization())
-        assert "\"tradeName\"" in put_the_item_in_the_cart.text
-        assert put_the_item_in_the_cart.status_code == 200
-
-        use_vitamins = app.order_fixture.cart_use_vitamins(vitaminsCount=10,
-                                                           head=app.token_autorization())
-
-        ordering = app.order_fixture.create_order(email=None, needEmail=False, needCall=False, mnogoRuCardId=None,
-                                              head=app.token_autorization())
-        print(ordering, formatted_json_str, sep='\n\n')
-        if ordering.status_code == 200:
-            break
     assert "\"orderId\"" in ordering.text
     assert "\"orderNum\"" in ordering.text
     assert loads(ordering.text)['order']["vitaminsUsed"] == 0
@@ -105,6 +86,11 @@ def test_create_order_with_invalid_count_vitamins_overrange(app):
     formatted_json_str = pprint.pformat(put_the_item_in_the_cart.text)
     print(put_the_item_in_the_cart.request.body)
     print(put_the_item_in_the_cart, formatted_json_str, sep='\n\n')
+    while loads(put_the_item_in_the_cart.text)['totalSum'] < 500:
+        put_the_item_in_the_cart = app.order_fixture.cart \
+            (dataset=app.order_fixture.generate_payload(2), head=app.token_autorization())
+        if loads(put_the_item_in_the_cart.text)['totalSum'] >= 500:
+            break
     assert "\"tradeName\"" in put_the_item_in_the_cart.text
     assert put_the_item_in_the_cart.status_code == 200
 
@@ -124,21 +110,6 @@ def test_create_order_with_invalid_count_vitamins_overrange(app):
     formatted_json_str = pprint.pformat(ordering.text)
     print(ordering.request.body)
     print(ordering, formatted_json_str, sep='\n\n')
-
-    while ordering.status_code == 400 and "\"Минимальная сумма заказа =" in ordering.text:
-        put_the_item_in_the_cart = app.order_fixture.cart(dataset=app.order_fixture.generate_payload(3),
-                                                          head=app.token_autorization())
-        assert "\"tradeName\"" in put_the_item_in_the_cart.text
-        assert put_the_item_in_the_cart.status_code == 200
-
-        use_vitamins = app.order_fixture.cart_use_vitamins(vitaminsCount=150,
-                                                           head=app.token_autorization())
-
-        ordering = app.order_fixture.create_order(email=None, needEmail=False, needCall=False, mnogoRuCardId=None,
-                                              head=app.token_autorization())
-        print(ordering, formatted_json_str, sep='\n\n')
-        if ordering.status_code == 200:
-            break
     assert "\"orderId\"" in ordering.text
     assert "\"orderNum\"" in ordering.text
     assert loads(ordering.text)['order']["vitaminsUsed"] > 0
@@ -193,6 +164,11 @@ def test_create_order_with_max_vitamins(app):
     formatted_json_str = pprint.pformat(put_the_item_in_the_cart.text)
     print(put_the_item_in_the_cart.request.body)
     print(put_the_item_in_the_cart, formatted_json_str, sep='\n\n')
+    while loads(put_the_item_in_the_cart.text)['totalSum'] < 500:
+        put_the_item_in_the_cart = app.order_fixture.cart \
+            (dataset=app.order_fixture.generate_payload(2), head=app.token_autorization())
+        if loads(put_the_item_in_the_cart.text)['totalSum'] >= 500:
+            break
     assert "\"tradeName\"" in put_the_item_in_the_cart.text
     assert put_the_item_in_the_cart.status_code == 200
 
@@ -216,21 +192,6 @@ def test_create_order_with_max_vitamins(app):
     formatted_json_str = pprint.pformat(ordering.text)
     print(ordering.request.body)
     print(ordering, formatted_json_str, sep='\n\n')
-
-    while ordering.status_code == 400 and "\"Минимальная сумма заказа =" in ordering.text:
-        put_the_item_in_the_cart = app.order_fixture.cart(dataset=app.order_fixture.generate_payload(3),
-                                                          head=app.token_autorization())
-        assert "\"tradeName\"" in put_the_item_in_the_cart.text
-        assert put_the_item_in_the_cart.status_code == 200
-
-        use_vitamins = app.order_fixture.cart_use_vitamins(vitaminsCount=100,
-                                                           head=app.token_autorization())
-
-        ordering = app.order_fixture.create_order(email=None, needEmail=False, needCall=False, mnogoRuCardId=None,
-                                                  head=app.token_autorization())
-        print(ordering, formatted_json_str, sep='\n\n')
-        if ordering.status_code == 200:
-            break
     assert "\"orderId\"" in ordering.text
     assert "\"orderNum\"" in ordering.text
     assert loads(ordering.text)['order']["vitaminsUsed"] > 0
@@ -242,6 +203,11 @@ def test_create_order_with_min_vitamins(app):
     formatted_json_str = pprint.pformat(put_the_item_in_the_cart.text)
     print(put_the_item_in_the_cart.request.body)
     print(put_the_item_in_the_cart, formatted_json_str, sep='\n\n')
+    while loads(put_the_item_in_the_cart.text)['totalSum'] < 500:
+        put_the_item_in_the_cart = app.order_fixture.cart \
+            (dataset=app.order_fixture.generate_payload(2), head=app.token_autorization())
+        if loads(put_the_item_in_the_cart.text)['totalSum'] >= 500:
+            break
     assert "\"tradeName\"" in put_the_item_in_the_cart.text
     assert put_the_item_in_the_cart.status_code == 200
 
@@ -265,21 +231,6 @@ def test_create_order_with_min_vitamins(app):
     formatted_json_str = pprint.pformat(ordering.text)
     print(ordering.request.body)
     print(ordering, formatted_json_str, sep='\n\n')
-
-    while ordering.status_code == 400 and "\"Минимальная сумма заказа =" in ordering.text:
-        put_the_item_in_the_cart = app.order_fixture.cart(dataset=app.order_fixture.generate_payload(3),
-                                                          head=app.token_autorization())
-        assert "\"tradeName\"" in put_the_item_in_the_cart.text
-        assert put_the_item_in_the_cart.status_code == 200
-
-        use_vitamins = app.order_fixture.cart_use_vitamins(vitaminsCount=100,
-                                                           head=app.token_autorization())
-
-        ordering = app.order_fixture.create_order(email=None, needEmail=False, needCall=False, mnogoRuCardId=None,
-                                                  head=app.token_autorization())
-        print(ordering, formatted_json_str, sep='\n\n')
-        if ordering.status_code == 200:
-            break
     assert "\"orderId\"" in ordering.text
     assert "\"orderNum\"" in ordering.text
     assert loads(ordering.text)['order']["vitaminsUsed"] > 0
@@ -324,6 +275,11 @@ def test_create_order_with_vitamins_su(app):
     formatted_json_str = pprint.pformat(put_the_item_in_the_cart.text)
     print(put_the_item_in_the_cart.request.body)
     print(put_the_item_in_the_cart, formatted_json_str, sep='\n\n')
+    while loads(put_the_item_in_the_cart.text)['totalSum'] < 500:
+        put_the_item_in_the_cart = app.order_fixture.cart \
+            (dataset=app.order_fixture.generate_payload(2), head=app.token_autorization())
+        if loads(put_the_item_in_the_cart.text)['totalSum'] >= 500:
+            break
     assert "\"tradeName\"" in put_the_item_in_the_cart.text
     assert put_the_item_in_the_cart.status_code == 200
 
@@ -347,42 +303,6 @@ def test_create_order_with_vitamins_su(app):
     formatted_json_str = pprint.pformat(ordering.text)
     print(ordering.request.body)
     print(ordering, formatted_json_str, sep='\n\n')
-
-    while ordering.status_code == 400 and "\"Минимальная сумма заказа =" in ordering.text:
-        put_the_item_in_the_cart = app.order_fixture.cart(dataset=app.order_fixture.generate_payload(3),
-                                                          head=app.token_auth_super_user(),
-                                                          userId='5ee852c50521b00001edffed')
-        assert "\"tradeName\"" in put_the_item_in_the_cart.text
-        assert put_the_item_in_the_cart.status_code == 200
-
-        use_vitamins = app.order_fixture.cart_use_vitamins(vitaminsCount=randrange(20, 100, 10),
-                                                           head=app.token_auth_super_user(),
-                                                           userId='5ee852c50521b00001edffed')
-
-        choice_autodest_before_order = app.choice_autodest(id=choice(parameters.autodestid_for_order),
-                                                           head=app.token_auth_super_user(),
-                                                           userId='5ee852c50521b00001edffed')
-
-        ordering = app.order_fixture.create_order(email=None, needEmail=False, needCall=False, mnogoRuCardId=None,
-                                                  head=app.token_auth_super_user(),
-                                                  userId='5ee852c50521b00001edffed')
-        print(ordering, formatted_json_str, sep='\n\n')
-        if ordering.status_code == 200:
-            break
     assert "\"orderId\"" in ordering.text
     assert "\"orderNum\"" in ordering.text
     assert loads(ordering.text)['order']["vitaminsUsed"] > 0
-
-
-
-
-
-
-
-
-
-
-
-
-
-

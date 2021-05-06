@@ -44,19 +44,31 @@ def test_without_token_user_order(app):
 
 
 def test_order_autodest_false(app):
+    choice_city = app.choice_city(id='5e574663f4d315000196b176', manualChange=True,
+                                  head=app.token_autorization())
+    assert choice_city.status_code == 200
+
+    choice_city = app.choice_city(id='5e574686defa1e000131b5df', manualChange=True,
+                                  head=app.token_autorization())
+    assert choice_city.status_code == 200
+
+    choice_autodest_before_order = app.choice_autodest(id=choice(parameters.not_active_autodest),
+                                                       head=app.token_autorization())
+    print(choice_autodest_before_order.request.body)
+    assert choice_autodest_before_order.status_code == 404
+
     put_the_item_in_the_cart = app.order_fixture.cart(dataset=app.order_fixture.generate_payload(2),
                                                       head=app.token_autorization())
     formatted_json_str = pprint.pformat(put_the_item_in_the_cart.text)
     print(put_the_item_in_the_cart.request.body)
     print(put_the_item_in_the_cart, formatted_json_str, sep='\n\n')
+    while loads(put_the_item_in_the_cart.text)['totalSum'] < 500:
+        put_the_item_in_the_cart = app.order_fixture.cart \
+            (dataset=app.order_fixture.generate_payload(2), head=app.token_autorization())
+        if loads(put_the_item_in_the_cart.text)['totalSum'] >= 500:
+            break
     assert "\"tradeName\"" in put_the_item_in_the_cart.text
     assert put_the_item_in_the_cart.status_code == 200
-
-    choice_autodest_before_order = app.choice_autodest(id=choice(parameters.not_active_autodest),
-                                                       head=app.token_autorization())
-    print(choice_autodest_before_order.request.body)
-    print(choice_autodest_before_order, formatted_json_str, sep='\n\n')
-    assert choice_autodest_before_order.status_code == 404
 
     ordering = app.order_fixture.create_order(email=None, needEmail=False, needCall=False,
                                        mnogoRuCardId=None, head=app.token_autorization())
@@ -73,6 +85,11 @@ def test_order_without_autodest(app):
     formatted_json_str = pprint.pformat(put_the_item_in_the_cart.text)
     print(put_the_item_in_the_cart.request.body)
     print(put_the_item_in_the_cart, formatted_json_str, sep='\n\n')
+    while loads(put_the_item_in_the_cart.text)['totalSum'] < 500:
+        put_the_item_in_the_cart = app.order_fixture.cart \
+            (dataset=app.order_fixture.generate_payload(2), head=app.token_autorization())
+        if loads(put_the_item_in_the_cart.text)['totalSum'] >= 500:
+            break
     assert "\"tradeName\"" in put_the_item_in_the_cart.text
     assert put_the_item_in_the_cart.status_code == 200
 
@@ -127,16 +144,6 @@ def test_duplicate_order(app):
     ordering = app.order_fixture.create_order(email='nat19@yandex.ru', needEmail=False, needCall=False,
                                               mnogoRuCardId=None, head=app.token_autorization())
 
-    # while ordering.status_code == 400 and "\"Минимальная сумма заказа =" in ordering.text:
-    #     put_the_item_in_the_cart = app.order_fixture.cart(dataset=app.order_fixture.generate_payload(3),
-    #                                                       head=app.token_autorization())
-    #     assert "\"tradeName\"" in put_the_item_in_the_cart.text
-    #     assert put_the_item_in_the_cart.status_code == 200
-    #     ordering = app.order_fixture.create_order(email='nat19@yandex.ru', needEmail=False, needCall=False,
-    #                                               mnogoRuCardId=None, head=app.token_autorization())
-    #     print(ordering, formatted_json_str, sep='\n\n')
-    #     if ordering.status_code == 200:
-    #         break
     formatted_json_str = pprint.pformat(ordering.text)
     print(ordering.request.body)
     print(ordering, formatted_json_str, sep='\n\n')
@@ -160,11 +167,16 @@ def test_duplicate_order(app):
 
 
 def test_incorrect_number_mnoro_ru(app):
-    put_the_item_in_the_cart = app.order_fixture.cart(dataset=app.order_fixture.generate_payload(3),
+    put_the_item_in_the_cart = app.order_fixture.cart(dataset=app.order_fixture.generate_payload(2),
                                                       head=app.token_autorization())
     formatted_json_str = pprint.pformat(put_the_item_in_the_cart.text)
     print(put_the_item_in_the_cart.request.body)
     print(put_the_item_in_the_cart, formatted_json_str, sep='\n\n')
+    while loads(put_the_item_in_the_cart.text)['totalSum'] < 500:
+        put_the_item_in_the_cart = app.order_fixture.cart \
+            (dataset=app.order_fixture.generate_payload(2), head=app.token_autorization())
+        if loads(put_the_item_in_the_cart.text)['totalSum'] >= 500:
+            break
     assert "\"tradeName\"" in put_the_item_in_the_cart.text
     assert put_the_item_in_the_cart.status_code == 200
 

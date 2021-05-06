@@ -32,7 +32,7 @@ class OrdersHelper:
         return self.app._s.put(self.app.host + '/Cart', json=body, headers=head)
 
     def cart_use_vitamins(self, head, vitaminsCount, userId=None):  #метод для SU и User
-        body = {'vitaminsCount': vitaminsCount, 'userId': userId}
+        body = {"vitaminsCount": vitaminsCount, "userId": userId}
         return self.app._s.put(self.app.host + '/Cart/UseVitamins', json=body, headers=head)
 
     def cart_with_deferred_items(self, head, items):
@@ -42,6 +42,14 @@ class OrdersHelper:
     def get_cart_user(self, head, userId=None):
         parameters = {"userId": userId}
         return self.app._s.get(self.app.host + '/Cart', params=parameters, headers=head)
+
+    def cart_use_promocode(self, head, promoCode, userId=None):
+        body = {"promoCode": promoCode, "userId": userId}
+        return self.app._s.put(self.app.host + '/Cart/PromoCode', json=body, headers=head)
+
+    def delete_promocode_from_the_cart(self, head, promoCode, userId=None):
+        params = {"promoCode": promoCode, "userId": userId}
+        return self.app._s.delete(self.app.host + '/Cart/PromoCode', params=params)
 
 # Заказ
 
