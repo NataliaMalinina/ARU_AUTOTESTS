@@ -49,7 +49,7 @@ class OrdersHelper:
 
     def delete_promocode_from_the_cart(self, head, promoCode, userId=None):
         params = {"promoCode": promoCode, "userId": userId}
-        return self.app._s.delete(self.app.host + '/Cart/PromoCode', params=params)
+        return self.app._s.delete(self.app.host + '/Cart/PromoCode', params=params, headers=head)
 
 # Заказ
 
