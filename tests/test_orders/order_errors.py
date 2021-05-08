@@ -195,6 +195,37 @@ def test_incorrect_number_mnoro_ru(app):
     assert ordering.status_code == 400
 
 
+def test_null_items_in_cart(app):
+    cart = app.order_fixture.get_cart_user(head=app.token_autorization())
+    cart_json = loads(cart.text)
+    replace_deferred_items = cart_json['items']
+    for item in replace_deferred_items:
+        item['amount'] = 0
+
+    cart = app.order_fixture.cart(dataset=replace_deferred_items, head=app.token_autorization())
+
+    put_the_item_in_the_cart = app.order_fixture.cart(dataset=app.order_fixture.generate_payload(0),
+                                                      head=app.token_autorization())
+    formatted_json_str = pprint.pformat(put_the_item_in_the_cart.text)
+    print(put_the_item_in_the_cart.request.body)
+    print(put_the_item_in_the_cart, formatted_json_str, sep='\n\n')
+
+    choice_autodest_before_order = app.choice_autodest(id=choice(parameters.autodestid_for_order),
+                                                       head=app.token_autorization())
+    print(choice_autodest_before_order.request.body)
+    print(choice_autodest_before_order, formatted_json_str, sep='\n\n')
+    assert choice_autodest_before_order.status_code == 200
+
+    ordering = app.order_fixture.create_order(email='nat19@yandex.ru', needEmail=False, needCall=False,
+                                              mnogoRuCardId=None, head=app.token_autorization())
+    formatted_json_str = pprint.pformat(ordering.text)
+    print(ordering.request.body)
+    print(ordering, formatted_json_str, sep='\n\n')
+    assert "\"Корзина пуста\"" in ordering.text
+    assert ordering.status_code == 400
+
+
+
 
 
 

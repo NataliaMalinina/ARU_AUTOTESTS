@@ -1,6 +1,6 @@
 import pprint
 from json import loads
-from random import randrange, choice
+from random import choice
 from model import parameters
 from time import sleep
 
@@ -316,9 +316,86 @@ def test_cancel_order_with_promocode(app):
     assert delete_promocode.status_code == 200
 
 
+#Error
 
 
+def test_not_found_promocode(app):
+    put_the_item_in_the_cart = app.order_fixture.cart(dataset=app.order_fixture.generate_payload(2),
+                                                      head=app.token_autorization())
+    formatted_json_str = pprint.pformat(put_the_item_in_the_cart.text)
+    print(put_the_item_in_the_cart.request.body)
+    print(put_the_item_in_the_cart, formatted_json_str, sep='\n\n')
+    while loads(put_the_item_in_the_cart.text)['totalSum'] < 500:
+        put_the_item_in_the_cart = app.order_fixture.cart \
+            (dataset=app.order_fixture.generate_payload(2), head=app.token_autorization())
+        if loads(put_the_item_in_the_cart.text)['totalSum'] >= 500:
+            break
+    assert "\"tradeName\"" in put_the_item_in_the_cart.text
+    assert put_the_item_in_the_cart.status_code == 200
 
+    use_promocode = app.order_fixture.cart_use_promocode(promoCode="999gfjgf", head=app.token_autorization())
+
+    formatted_json_str = pprint.pformat(use_promocode.text)
+    print(use_promocode.request.body)
+    print(use_promocode, formatted_json_str, sep='\n\n')
+    assert 'Указаный промо-код не найден' in use_promocode.text
+    assert use_promocode.status_code == 404
+
+
+def test_already_used_promocode(app):
+    put_the_item_in_the_cart = app.order_fixture.cart(dataset=app.order_fixture.generate_payload(2),
+                                                        head=app.token_autorization())
+    formatted_json_str = pprint.pformat(put_the_item_in_the_cart.text)
+    print(put_the_item_in_the_cart.request.body)
+    print(put_the_item_in_the_cart, formatted_json_str, sep='\n\n')
+    while loads(put_the_item_in_the_cart.text)['totalSum'] < 500:
+        put_the_item_in_the_cart = app.order_fixture.cart \
+            (dataset=app.order_fixture.generate_payload(2), head=app.token_autorization())
+        if loads(put_the_item_in_the_cart.text)['totalSum'] >= 500:
+                break
+    assert "\"tradeName\"" in put_the_item_in_the_cart.text
+    assert put_the_item_in_the_cart.status_code == 200
+
+    use_promocode = app.order_fixture.cart_use_promocode(promoCode="RIGA1", head=app.token_autorization())
+
+    formatted_json_str = pprint.pformat(use_promocode.text)
+    print(use_promocode.request.body)
+    print(use_promocode, formatted_json_str, sep='\n\n')
+    assert loads(use_promocode.text)['promoCodes'][0]['isUsed'] == False
+    assert 'Промокод уже был использован' in use_promocode.text
+    assert use_promocode.status_code == 200
+
+    delete_promocode = app.order_fixture.delete_promocode_from_the_cart(promoCode='RIGA1',
+                                                                        head=app.token_autorization())
+    assert delete_promocode.status_code == 200
+
+
+def test_promocode_is_not_valid_yet(app):
+    put_the_item_in_the_cart = app.order_fixture.cart(dataset=app.order_fixture.generate_payload(2),
+                                                      head=app.token_autorization())
+    formatted_json_str = pprint.pformat(put_the_item_in_the_cart.text)
+    print(put_the_item_in_the_cart.request.body)
+    print(put_the_item_in_the_cart, formatted_json_str, sep='\n\n')
+    while loads(put_the_item_in_the_cart.text)['totalSum'] < 500:
+        put_the_item_in_the_cart = app.order_fixture.cart \
+            (dataset=app.order_fixture.generate_payload(2), head=app.token_autorization())
+        if loads(put_the_item_in_the_cart.text)['totalSum'] >= 500:
+            break
+    assert "\"tradeName\"" in put_the_item_in_the_cart.text
+    assert put_the_item_in_the_cart.status_code == 200
+
+    use_promocode = app.order_fixture.cart_use_promocode(promoCode="MSKAPTEKA", head=app.token_autorization())
+
+    formatted_json_str = pprint.pformat(use_promocode.text)
+    print(use_promocode.request.body)
+    print(use_promocode, formatted_json_str, sep='\n\n')
+    assert loads(use_promocode.text)['promoCodes'][0]['isUsed'] == False
+    assert 'Промо-код еще не действует' in use_promocode.text
+    assert use_promocode.status_code == 200
+
+    delete_promocode = app.order_fixture.delete_promocode_from_the_cart(promoCode='MSKAPTEKA',
+                                                                        head=app.token_autorization())
+    assert delete_promocode.status_code == 200
 
 
 

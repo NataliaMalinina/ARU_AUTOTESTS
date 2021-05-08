@@ -5,6 +5,7 @@ from model import parameters
 
 # User
 
+
 def test_create_order_with_vitamins(app):
     put_the_item_in_the_cart = app.order_fixture.cart(dataset=app.order_fixture.generate_payload(2),
                                                       head=app.token_autorization())
