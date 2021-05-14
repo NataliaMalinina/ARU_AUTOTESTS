@@ -1349,10 +1349,6 @@ def test_use_synonym_promocode_and_the_same_promocode(app):
     assert len(loads(ordering.text)['order']['promoCodes']) != 0
 
 
-
-
-
-
 #SU
 
 

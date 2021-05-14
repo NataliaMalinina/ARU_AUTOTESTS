@@ -242,7 +242,7 @@ def test_create_order_with_min_vitamins(app):
 
 def test_add_vitamins_to_user(app):
     add_vitamins = app.order_fixture.operation_with_vitamins(userId='5ee852c50521b00001edffed', head=app.token_auth_super_user(),
-                                                             value=100, updatingType='Credit')
+                                                             value=300, updatingType='Credit')
 
     formatted_json_str = pprint.pformat(add_vitamins.text)
     print(add_vitamins.request.body)
