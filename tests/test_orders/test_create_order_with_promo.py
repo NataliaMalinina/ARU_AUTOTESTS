@@ -1179,7 +1179,7 @@ def test_promocode_for_special_good_over_the_limit_summ_in_mounth(app):
     assert delete_promocode.status_code == 200
 
 
-def test_use_good_with_promocode_and_usual_good(app):
+def test_use_good_with_promocode_and_ordinary_good(app):
     dataset = [{
         'itemId': '5d6509c484406a0001aaf096',
         'amount': 1,
@@ -1220,10 +1220,6 @@ def test_use_good_with_promocode_and_usual_good(app):
     assert "\"orderId\"" in ordering.text
     assert "\"orderNum\"" in ordering.text
     assert len(loads(ordering.text)['order']['promoCodes']) != 0
-
-
-
-
 
 
 #Olekstra
