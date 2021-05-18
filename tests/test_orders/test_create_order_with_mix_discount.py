@@ -598,7 +598,164 @@ def test_use_promocode_sberbank_and_vtb_discount_vtb_more(app):
     assert ordering.status_code == 200
     assert "\"orderId\"" in ordering.text
     assert "\"orderNum\"" in ordering.text
-    assert len(loads(ordering.text)['order']['promoCodes']) > 0
+    assert len(loads(ordering.text)['order']['promoCodes']) == 1
 
     delete_promocode = app.order_fixture.delete_promocode_from_the_cart(promoCode='DV1QDUC81NDM',
                                                                         head=app.token_autorization())
+
+
+def test_use_promocode_olekstra_and_sber(app):
+    dataset = [{
+        'itemId': '5d6509d12fd44a0001b1434b',
+        'amount': 1,
+        'deferred': False
+    }]
+    put_the_item_in_the_cart = app.order_fixture.cart(dataset=dataset,
+                                                      head=app.token_autorization())
+    formatted_json_str = pprint.pformat(put_the_item_in_the_cart.text)
+    print(put_the_item_in_the_cart.request.body)
+    print(put_the_item_in_the_cart, formatted_json_str, sep='\n\n')
+    assert "\"tradeName\"" in put_the_item_in_the_cart.text
+    assert put_the_item_in_the_cart.status_code == 200
+
+    use_promocode = app.order_fixture.cart_use_promocode(promoCode='6830016944074', head=app.token_autorization())
+    formatted_json_str = pprint.pformat(use_promocode.text)
+    print(use_promocode.request.body)
+    print(use_promocode, formatted_json_str, sep='\n\n')
+    assert loads(use_promocode.text)['promoCodes'][0]['isUsed'] == True
+    assert use_promocode.status_code == 200
+
+    use_promocode2 = app.order_fixture.cart_use_promocode(promoCode='DV2K3CC82JBL', head=app.token_autorization())
+    formatted_json_str = pprint.pformat(use_promocode2.text)
+    print(use_promocode2.request.body)
+    print(use_promocode2, formatted_json_str, sep='\n\n')
+    assert loads(use_promocode2.text)['promoCodes'][0]['isUsed'] == False
+    assert loads(use_promocode2.text)['promoCodes'][0]['hint'] == 'Промо-код не дает наилучшую скидку по данной корзине'
+    assert use_promocode2.status_code == 200
+
+    ordering = app.order_fixture.create_order(email=None, needEmail=False, needCall=False, mnogoRuCardId=None,
+                                              head=app.token_autorization())
+    formatted_json_str = pprint.pformat(ordering.text)
+    print(ordering.request.body)
+    print(ordering, formatted_json_str, sep='\n\n')
+    assert ordering.status_code == 200
+    assert "\"orderId\"" in ordering.text
+    assert "\"orderNum\"" in ordering.text
+    assert len(loads(ordering.text)['order']['promoCodes']) == 1
+
+    delete_promocode = app.order_fixture.delete_promocode_from_the_cart(promoCode='6830016944074',
+                                                                        head=app.token_autorization())
+
+
+def test_use_vitamins_and_mnogo_ru_cart(app):
+    put_the_item_in_the_cart = app.order_fixture.cart(dataset=app.order_fixture.generate_payload(2),
+                                                      head=app.token_autorization())
+    formatted_json_str = pprint.pformat(put_the_item_in_the_cart.text)
+    print(put_the_item_in_the_cart.request.body)
+    print(put_the_item_in_the_cart, formatted_json_str, sep='\n\n')
+    while loads(put_the_item_in_the_cart.text)['totalSum'] < 500:
+        put_the_item_in_the_cart = app.order_fixture.cart \
+            (dataset=app.order_fixture.generate_payload(2), head=app.token_autorization())
+        if loads(put_the_item_in_the_cart.text)['totalSum'] >= 500:
+            break
+    assert "\"tradeName\"" in put_the_item_in_the_cart.text
+    assert put_the_item_in_the_cart.status_code == 200
+
+    use_vitamins = app.order_fixture.cart_use_vitamins(vitaminsCount=40,
+                                                       head=app.token_autorization())
+    assert loads(use_vitamins.text)['vitaminsInfo']["vitaminsUsed"] > 0
+
+    ordering = app.order_fixture.create_order(email='nat19@yandex.ru', needEmail=False, needCall=False,
+                                              mnogoRuCardId='12345678', head=app.token_autorization())
+    formatted_json_str = pprint.pformat(ordering.text)
+    print(ordering.request.body)
+    print(ordering, formatted_json_str, sep='\n\n')
+    assert "\"orderId\"" in ordering.text
+    assert "\"orderNum\"" in ordering.text
+    assert "\"MnogoRu\"" in ordering.text
+    assert loads(ordering.text)['order']["vitaminsUsed"] == 40
+
+
+def test_use_promocode_and_mnogo_ru_cart(app):
+    put_the_item_in_the_cart = app.order_fixture.cart(dataset=app.order_fixture.generate_payload(2),
+                                                      head=app.token_autorization())
+    formatted_json_str = pprint.pformat(put_the_item_in_the_cart.text)
+    print(put_the_item_in_the_cart.request.body)
+    print(put_the_item_in_the_cart, formatted_json_str, sep='\n\n')
+    while loads(put_the_item_in_the_cart.text)['totalSum'] < 500:
+        put_the_item_in_the_cart = app.order_fixture.cart \
+            (dataset=app.order_fixture.generate_payload(2), head=app.token_autorization())
+        if loads(put_the_item_in_the_cart.text)['totalSum'] >= 500:
+            break
+    assert "\"tradeName\"" in put_the_item_in_the_cart.text
+    assert put_the_item_in_the_cart.status_code == 200
+
+    use_promocode = app.order_fixture.cart_use_promocode(promoCode="RIGA2", head=app.token_autorization())
+
+    formatted_json_str = pprint.pformat(use_promocode.text)
+    print(use_promocode.request.body)
+    print(use_promocode, formatted_json_str, sep='\n\n')
+    assert loads(use_promocode.text)['promoCodes'][0]['isUsed'] == True
+    assert use_promocode.status_code == 200
+
+    ordering = app.order_fixture.create_order(email='nat19@yandex.ru', needEmail=False, needCall=False,
+                                              mnogoRuCardId='12345678', head=app.token_autorization())
+    formatted_json_str = pprint.pformat(ordering.text)
+    print(ordering.request.body)
+    print(ordering, formatted_json_str, sep='\n\n')
+    assert "\"orderId\"" in ordering.text
+    assert "\"orderNum\"" in ordering.text
+    assert "\"MnogoRu\"" in ordering.text
+    assert len(loads(ordering.text)['order']['promoCodes']) == 1
+
+
+def test_use_vitamins_promocode_and_mnogo_ru_cart(app):
+    put_the_item_in_the_cart = app.order_fixture.cart(dataset=app.order_fixture.generate_payload(2),
+                                                      head=app.token_autorization())
+    formatted_json_str = pprint.pformat(put_the_item_in_the_cart.text)
+    print(put_the_item_in_the_cart.request.body)
+    print(put_the_item_in_the_cart, formatted_json_str, sep='\n\n')
+    while loads(put_the_item_in_the_cart.text)['totalSum'] < 500:
+        put_the_item_in_the_cart = app.order_fixture.cart \
+            (dataset=app.order_fixture.generate_payload(2), head=app.token_autorization())
+        if loads(put_the_item_in_the_cart.text)['totalSum'] >= 500:
+            break
+    assert "\"tradeName\"" in put_the_item_in_the_cart.text
+    assert put_the_item_in_the_cart.status_code == 200
+
+    use_vitamins = app.order_fixture.cart_use_vitamins(vitaminsCount=30,
+                                                       head=app.token_autorization())
+
+    assert loads(use_vitamins.text)['vitaminsInfo']["vitaminsUsed"] > 0
+
+    use_promocode = app.order_fixture.cart_use_promocode(promoCode="RIGA2", head=app.token_autorization())
+
+    formatted_json_str = pprint.pformat(use_promocode.text)
+    print(use_promocode.request.body)
+    print(use_promocode, formatted_json_str, sep='\n\n')
+    assert loads(use_promocode.text)['promoCodes'][0]['isUsed'] == True
+    assert use_promocode.status_code == 200
+
+    ordering = app.order_fixture.create_order(email='nat19@yandex.ru', needEmail=False, needCall=False,
+                                              mnogoRuCardId='12345678', head=app.token_autorization())
+    formatted_json_str = pprint.pformat(ordering.text)
+    print(ordering.request.body)
+    print(ordering, formatted_json_str, sep='\n\n')
+    assert "\"orderId\"" in ordering.text
+    assert "\"orderNum\"" in ordering.text
+    assert "\"MnogoRu\"" in ordering.text
+    assert len(loads(ordering.text)['order']['promoCodes']) == 1
+    assert loads(ordering.text)['order']["vitaminsUsed"] == 30
+
+
+
+
+
+
+
+
+
+
+
+
+
