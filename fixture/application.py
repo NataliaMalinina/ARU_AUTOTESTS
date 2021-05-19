@@ -22,6 +22,12 @@ class Application:
         data = {"userName": "MNS", "password": "Prokhorova23"}
         return self._s.post(self.host + '/AdminUser/Auth', json=data)
 
+    def auth_for_migration(self, phone, code, access_token):
+        data = {"type": "BySms", "code": f'{code}', "phone": f'{phone}', "timeZone": 0, "referalId": None}
+        return self._s.post(self.host + '/Auth/Auth', json=data, headers={'Content-Type':'application/json',
+               'Authorization': 'Bearer {}'.format(access_token)})
+
+
 # Получение токена
 
     def token_autorization(self):
@@ -43,6 +49,12 @@ class Application:
         authorization = self.choice_city_shadow_user(id='5e574663f4d315000196b176', manualChange=True).headers
         head = {'Authorization': f"Bearer {authorization['X-Shadowuser']}"}
         return head
+
+# Получение UserPreferences (Метод получения настроек пользователя (выбранный город / аптека))
+
+    def user_preferences(self, head):
+        preferences =self._s.get(self.host + '/User/Preferences', headers=head)
+        return preferences
 
 # Поиск по фразе
 

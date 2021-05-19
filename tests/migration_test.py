@@ -6,7 +6,6 @@ from model import parameters
 def test_migration_shadow_user_to_auth_user_city(app):
     cityid = choice(parameters.cityid)
     choice_city = app.choice_city_shadow_user(id=cityid, manualChange=True)
-    print(choice_city.headers)
     formatted_json_str = pprint.pformat(choice_city.text)
     print(choice_city.url, formatted_json_str, sep='\n\n')
     while cityid == '5e574663b1585900015ed444':
@@ -14,11 +13,9 @@ def test_migration_shadow_user_to_auth_user_city(app):
     if cityid != '5e574663b1585900015ed444':
         assert choice_city.status_code == 200
 
-    auth_user = app.auth(code='9213', phone='+79139519213')
-    print(auth_user.headers)
-    #auth_user.headers.update({'authorization': loads(choice_city['id'])})
+    access_token = choice_city.headers['X-Shadowuser']
+    auth_user = app.auth_for_migration(code='9213', phone='+79139519213', access_token=access_token)
+    user_preferences = app.user_preferences(head=app.token_autorization())
     assert auth_user.status_code == 200
     assert "\"token\":" in auth_user.text
-
-    assert loads(auth_user.text)['cityId'] == loads(choice_city.text)['id']
-# после авторизации вызвать Преференс и там сравнить id города
+    assert loads(user_preferences.text)['selectedCity']['id'] == cityid
