@@ -151,7 +151,7 @@ def test_order_with_promocode_onceonly_false_unlimited_false(app):
     assert "\"tradeName\"" in put_the_item_in_the_cart.text
     assert put_the_item_in_the_cart.status_code == 200
 
-    use_promocode = app.order_fixture.cart_use_promocode(promoCode="RIGA4", head=app.token_autorization())
+    use_promocode = app.order_fixture.cart_use_promocode(promoCode="BЯTKA", head=app.token_autorization())
     formatted_json_str = pprint.pformat(use_promocode.text)
     print(use_promocode.request.body)
     print(use_promocode, formatted_json_str, sep='\n\n')
@@ -615,7 +615,7 @@ def test_use_two_promocode_with_different_discount_first_is_less(app):
     assert use_promocode.status_code == 200
 
     sleep(2)
-    use_promocode2 = app.order_fixture.cart_use_promocode(promoCode="LEO2O15", head=app.token_autorization())
+    use_promocode2 = app.order_fixture.cart_use_promocode(promoCode="TEЛEAПTEKA", head=app.token_autorization())
     formatted_json_str = pprint.pformat(use_promocode2.text)
     print(use_promocode2.request.body)
     print(use_promocode2, formatted_json_str, sep='\n\n')
@@ -629,13 +629,13 @@ def test_use_two_promocode_with_different_discount_first_is_less(app):
                                                                         head=app.token_autorization())
     assert delete_promocode.status_code == 200
 
-    delete_promocode = app.order_fixture.delete_promocode_from_the_cart(promoCode='LEO2O15',
+    delete_promocode = app.order_fixture.delete_promocode_from_the_cart(promoCode='TEЛEAПTEKA',
                                                                         head=app.token_autorization())
     assert delete_promocode.status_code == 200
 
 
 def test_use_two_promocode_with_different_discount_first_is_more_expensive(app):
-    use_promocode = app.order_fixture.cart_use_promocode(promoCode="LEO2O15", head=app.token_autorization())
+    use_promocode = app.order_fixture.cart_use_promocode(promoCode="DSFG46C", head=app.token_autorization())
 
     formatted_json_str = pprint.pformat(use_promocode.text)
     print(use_promocode.request.body)
@@ -658,7 +658,7 @@ def test_use_two_promocode_with_different_discount_first_is_more_expensive(app):
                                                                         head=app.token_autorization())
     assert delete_promocode.status_code == 200
 
-    delete_promocode = app.order_fixture.delete_promocode_from_the_cart(promoCode='LEO2O15',
+    delete_promocode = app.order_fixture.delete_promocode_from_the_cart(promoCode='DSFG46C',
                                                                         head=app.token_autorization())
     assert delete_promocode.status_code == 200
 
@@ -810,7 +810,7 @@ def test_use_promocode_100_but_summ_order_not_200(app):
 
     dataset = [{
         'itemId': '5d65077f2fd44a0001b12715',
-        'amount': 24,
+        'amount': 11,
         'deferred': False
     }]
 
@@ -826,7 +826,7 @@ def test_use_promocode_100_but_summ_order_not_200(app):
     assert use_promocode.status_code == 200
     assert loads(use_promocode.text)['promoCodes'][0]['hint'] == 'Суммы заказа недостаточно для применения данного промо кода (200 руб.)'
 
-    dataset[0]['amount'] = 25
+    dataset[0]['amount'] = 12
     put_the_item_in_the_cart = app.order_fixture.cart(dataset=dataset, head=app.token_autorization())
 
     ordering = app.order_fixture.create_order(email=None, needEmail=False, needCall=False, mnogoRuCardId=None,
@@ -1099,8 +1099,8 @@ def test_promocode_for_special_wrong_good(app):
                                                                         head=app.token_autorization())
     assert delete_promocode.status_code == 200
 
-
-def test_promocode_for_special_good_over_the_limit_count_in_mounth(app):
+# СДЕЛАТЬ ПОСЛЕ ТОГО как покажу 500
+def test_promocode_for_special_good_over_the_limit_count_in_mounth(app): # Взят токен резервного пользователя +79833221020, так как тот тужен был для теста
     dataset = [{
         'itemId': '5d65073f2fd44a0001b124b0',
         'amount': 11,
@@ -1108,21 +1108,21 @@ def test_promocode_for_special_good_over_the_limit_count_in_mounth(app):
     }]
 
     choice_autodest_before_order = app.choice_autodest(id=choice(parameters.autodestid_for_order),
-                                                       head=app.token_autorization())
+                                                       head=app.token_autorization_reserv_user())
     formatted_json_str = pprint.pformat(choice_autodest_before_order.text)
     print(choice_autodest_before_order.request.body)
     print(choice_autodest_before_order, formatted_json_str, sep='\n\n')
     assert choice_autodest_before_order.status_code == 200
 
     put_the_item_in_the_cart = app.order_fixture.cart(dataset=dataset,
-                                                      head=app.token_autorization())
+                                                      head=app.token_autorization_reserv_user())
     formatted_json_str = pprint.pformat(put_the_item_in_the_cart.text)
     print(put_the_item_in_the_cart.request.body)
     print(put_the_item_in_the_cart, formatted_json_str, sep='\n\n')
     assert "\"tradeName\"" in put_the_item_in_the_cart.text
     assert put_the_item_in_the_cart.status_code == 200
 
-    use_promocode = app.order_fixture.cart_use_promocode(promoCode='9ZR1AOX', head=app.token_autorization())
+    use_promocode = app.order_fixture.cart_use_promocode(promoCode='9ZR1AOX', head=app.token_autorization_reserv_user())
     formatted_json_str = pprint.pformat(use_promocode.text)
     print(use_promocode.request.body)
     print(use_promocode, formatted_json_str, sep='\n\n')
@@ -1130,53 +1130,63 @@ def test_promocode_for_special_good_over_the_limit_count_in_mounth(app):
     assert loads(use_promocode.text)['promoCodes'][0]['hint'] == 'Превышен месячный лимит количества по промо-коду.'
     assert use_promocode.status_code == 200
 
-    # ordering = app.order_fixture.create_order(email=None, needEmail=False, needCall=False, mnogoRuCardId=None,  КОРОЧ - ЗАКАЗ НЕ МОГУ СДЕЛАТЬ, ТАК КАК КАКАЯ-ТО ХУЙНЯ С "ИТОГЕ ПО КОРЗИНЕ ИЗМЕНИЛИСЬ" - КАК ТОЛЬКО ПОЧИНЯТ, ТАК И СДЕЛАЮ
-    #                                           head=app.token_autorization())
-    # formatted_json_str = pprint.pformat(ordering.text)
-    # print(ordering.request.body)
-    # print(ordering, formatted_json_str, sep='\n\n')
-    # assert ordering.status_code == 200
-    # assert "\"orderId\"" in ordering.text
-    # assert "\"orderNum\"" in ordering.text
-    # assert len(loads(ordering.text)['order']['promoCodes']) == 0
+    ordering = app.order_fixture.create_order(email=None, needEmail=False, needCall=False, mnogoRuCardId=None,
+                                               head=app.token_autorization_reserv_user())
+    formatted_json_str = pprint.pformat(ordering.text)
+    print(ordering.request.body)
+    print(ordering, formatted_json_str, sep='\n\n')
+    assert ordering.status_code == 200
+    assert "\"orderId\"" in ordering.text
+    assert "\"orderNum\"" in ordering.text
+    assert len(loads(ordering.text)['order']['promoCodes']) == 0
 
-    delete_promocode = app.order_fixture.delete_promocode_from_the_cart(promoCode='9ZR1AOX',
-                                                                        head=app.token_autorization())
-    assert delete_promocode.status_code == 200
+    # delete_promocode = app.order_fixture.delete_promocode_from_the_cart(promoCode='9ZR1AOX',
+    #                                                                     head=app.token_autorization_reserv_user())
+    # assert delete_promocode.status_code == 200
 
 
-def test_promocode_for_special_good_over_the_limit_summ_in_mounth(app):
+def test_promocode_for_special_good_over_the_limit_summ_in_mounth(app):  # Взят токен резервного пользователя +79833221020, так как тот тужен был для теста
     dataset = [{
         'itemId': '5d6509c484406a0001aaf096',
         'amount': 11,
         'deferred': False
     }]
     choice_autodest_before_order = app.choice_autodest(id=choice(parameters.autodestid_for_order),
-                                                       head=app.token_autorization())
+                                                       head=app.token_autorization_reserv_user())
     formatted_json_str = pprint.pformat(choice_autodest_before_order.text)
     print(choice_autodest_before_order.request.body)
     print(choice_autodest_before_order, formatted_json_str, sep='\n\n')
     assert choice_autodest_before_order.status_code == 200
 
     put_the_item_in_the_cart = app.order_fixture.cart(dataset=dataset,
-                                                      head=app.token_autorization())
+                                                      head=app.token_autorization_reserv_user())
     formatted_json_str = pprint.pformat(put_the_item_in_the_cart.text)
     print(put_the_item_in_the_cart.request.body)
     print(put_the_item_in_the_cart, formatted_json_str, sep='\n\n')
     assert "\"tradeName\"" in put_the_item_in_the_cart.text
     assert put_the_item_in_the_cart.status_code == 200
 
-    use_promocode = app.order_fixture.cart_use_promocode(promoCode='5HZVHCJ', head=app.token_autorization())
+    use_promocode = app.order_fixture.cart_use_promocode(promoCode='5HZVHCJ', head=app.token_autorization_reserv_user())
     formatted_json_str = pprint.pformat(use_promocode.text)
     print(use_promocode.request.body)
     print(use_promocode, formatted_json_str, sep='\n\n')
     assert loads(use_promocode.text)['promoCodes'][0]['isUsed'] == False
     assert loads(use_promocode.text)['promoCodes'][0]['hint'] == 'Превышен лимит месячной суммы по промо-коду.'
     assert use_promocode.status_code == 200
-    # с заказом та же фигня что и в предыдущем тесте
-    delete_promocode = app.order_fixture.delete_promocode_from_the_cart(promoCode='5HZVHCJ',
-                                                                        head=app.token_autorization())
-    assert delete_promocode.status_code == 200
+
+    ordering = app.order_fixture.create_order(email=None, needEmail=False, needCall=False, mnogoRuCardId=None,
+                                              head=app.token_autorization_reserv_user())
+    formatted_json_str = pprint.pformat(ordering.text)
+    print(ordering.request.body)
+    print(ordering, formatted_json_str, sep='\n\n')
+    assert ordering.status_code == 200
+    assert "\"orderId\"" in ordering.text
+    assert "\"orderNum\"" in ordering.text
+    assert len(loads(ordering.text)['order']['promoCodes']) == 0
+
+    # delete_promocode = app.order_fixture.delete_promocode_from_the_cart(promoCode='5HZVHCJ',
+    #                                                                     head=app.token_autorization_reserv_user())
+    # assert delete_promocode.status_code == 200
 
 
 def test_use_good_with_promocode_and_ordinary_good(app):
@@ -1470,6 +1480,9 @@ def test_su_use_promocode_for_user(app):
     assert "\"orderId\"" in ordering.text
     assert "\"orderNum\"" in ordering.text
     assert len(loads(ordering.text)['order']['promoCodes']) != 0
+
+    delete_promocode = app.order_fixture.delete_promocode_from_the_cart(promoCode='RIGA2',
+                                                                        head=app.token_autorization())
 
 
 def test_su_delete_promocode_for_user(app):

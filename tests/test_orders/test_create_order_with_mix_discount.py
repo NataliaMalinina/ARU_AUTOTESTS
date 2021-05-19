@@ -30,7 +30,7 @@ def test_use_max_of_vitamins_and_max_discount_promocode(app):
 
     assert loads(use_vitamins.text)['vitaminsInfo']["vitaminsUsed"] > 0
 
-    use_promocode = app.order_fixture.cart_use_promocode(promoCode="KUPON", head=app.token_autorization())
+    use_promocode = app.order_fixture.cart_use_promocode(promoCode="BPAЧ", head=app.token_autorization())
 
     formatted_json_str = pprint.pformat(use_promocode.text)
     print(use_promocode.request.body)
@@ -46,8 +46,8 @@ def test_use_max_of_vitamins_and_max_discount_promocode(app):
     assert ordering.status_code == 200
     assert "\"orderId\"" in ordering.text
     assert "\"orderNum\"" in ordering.text
-    assert len(loads(ordering.text)['order']['promoCodes']) == 0
-    assert loads(ordering.text)['order']["vitaminsUsed"] == 100  #тест пока не работает - так как 500 - когда поправят - запустить для отладки
+    assert len(loads(ordering.text)['order']['promoCodes']) == 1
+    assert loads(ordering.text)['order']["vitaminsUsed"] == 0
 
 
 def test_use_max_of_vitamins_and_any_promocode(app):

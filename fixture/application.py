@@ -29,6 +29,11 @@ class Application:
         head = {'Authorization': f"Bearer {authorization['token']}"}
         return head
 
+    def token_autorization_reserv_user(self):
+        authorization = loads(self.auth(phone='+79833221020', code='7392').text)
+        head = {'Authorization': f"Bearer {authorization['token']}"}
+        return head
+
     def token_auth_super_user(self):
         authorization = loads(self.auth_super_user().text)
         head = {'Authorization': f"Bearer {authorization['token']}"}
