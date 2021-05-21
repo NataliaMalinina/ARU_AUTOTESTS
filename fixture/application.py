@@ -24,8 +24,7 @@ class Application:
 
     def auth_for_migration(self, phone, code, access_token):
         data = {"type": "BySms", "code": f'{code}', "phone": f'{phone}', "timeZone": 0, "referalId": None}
-        return self._s.post(self.host + '/Auth/Auth', json=data, headers={'Content-Type':'application/json',
-               'Authorization': 'Bearer {}'.format(access_token)})
+        return self._s.post(self.host + '/Auth/Auth', json=data, headers=access_token)                                                       #{'Content-Type':'application/json','Authorization': 'Bearer {}'.format(access_token)}
 
 
 # Получение токена

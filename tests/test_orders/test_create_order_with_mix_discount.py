@@ -30,7 +30,7 @@ def test_use_max_of_vitamins_and_max_discount_promocode(app):
 
     assert loads(use_vitamins.text)['vitaminsInfo']["vitaminsUsed"] > 0
 
-    use_promocode = app.order_fixture.cart_use_promocode(promoCode="BPAЧ", head=app.token_autorization())
+    use_promocode = app.order_fixture.cart_use_promocode(promoCode="APTPA9", head=app.token_autorization())
 
     formatted_json_str = pprint.pformat(use_promocode.text)
     print(use_promocode.request.body)

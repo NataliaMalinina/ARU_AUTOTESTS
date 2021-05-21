@@ -27,9 +27,14 @@ class OrdersHelper:
         body = {"items": dataset}
         return self.app._s.put(self.app.host + '/Cart', json=body, headers=head)
 
-    def cart(self, head, dataset, userId=None):  #метод для SU и User
+    # def token(self):
+    #     cart = loads(self.cart((self, head=None, dataset=None, userId=None).text)
+    #     head = {'Authorization': f"Bearer {cart['token']}"}
+    #     return head
+
+    def cart(self, head, dataset, userId=None):                      #метод для SU и User
         body = {"items": dataset, "userId": userId}
-        return self.app._s.put(self.app.host + '/Cart', json=body, headers=head)
+        return self.app._s.put(self.app.host + '/Cart', json=body, headers=head)                                        #{"content-type": "application/json; charset=UTF-8",'Authorization':'Bearer {}'.format(head)})
 
     def cart_use_vitamins(self, head, vitaminsCount, userId=None):  #метод для SU и User
         body = {"vitaminsCount": vitaminsCount, "userId": userId}
@@ -41,7 +46,7 @@ class OrdersHelper:
 
     def get_cart_user(self, head, userId=None):
         parameters = {"userId": userId}
-        return self.app._s.get(self.app.host + '/Cart', params=parameters, headers=head)
+        return self.app._s.get(self.app.host + '/Cart', params=parameters, headers=head) #"content-type": "application/json; charset=UTF-8",'Authorization':'Bearer {}'.format(head)}
 
     def cart_use_promocode(self, head, promoCode, userId=None):
         body = {"promoCode": promoCode, "userId": userId}
