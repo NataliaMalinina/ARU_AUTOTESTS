@@ -1,3 +1,4 @@
+import collections
 import pprint
 from json import loads
 from random import choice
@@ -76,6 +77,94 @@ def test_migration_shadow_user_have_goods_to_auth_user_cart_not_have_any_good(ap
     print(cart_auth_user.url, formatted_json_str, sep='\n\n')
     assert cart_auth_user.status_code == 200
     assert loads(cart_auth_user.text)['items'] == loads(put_the_item_in_the_cart_shadow_user.text)['items']
+
+
+def test_migration_shadow_user_not_have_goods_to_auth_user_cart_have_any_good(app):
+    cart_auth_user = app.order_fixture.cart(head=app.token_autorization(), dataset=app.order_fixture.generate_payload(3))
+    formatted_json_str = pprint.pformat(cart_auth_user.text)
+    print(cart_auth_user.request.body)
+    print(cart_auth_user.url, formatted_json_str, sep='\n\n')
+    assert cart_auth_user.status_code == 200
+
+    token_shadow_user = app.token_shadow_user()
+    cart_shadow_user = app.order_fixture.get_cart_user(head=token_shadow_user)
+    formatted_json_str = pprint.pformat(cart_shadow_user.text)
+    print(cart_shadow_user.request.body)
+    print(cart_shadow_user.url, formatted_json_str, sep='\n\n')
+    assert cart_shadow_user.status_code == 200
+
+    auth_user = app.auth_for_migration(code='9213', phone='+79139519213', access_token=token_shadow_user)
+    token_autn_user = loads(auth_user.text)['token']
+    assert auth_user.status_code == 200
+    assert "\"token\":" in auth_user.text
+    cart_auth_user_after_authorization = app.order_fixture.get_cart_user(head={'Authorization': 'Bearer {}'.format(token_autn_user)})
+    assert len(loads(cart_auth_user_after_authorization.text)['items']) > len(loads(cart_shadow_user.text)['items'])
+
+
+def test_migration_shadow_user_have_goods_to_auth_user_cart_also_have_any_good(app):
+    cart = app.order_fixture.get_cart_user(head=app.token_autorization())
+    cart_json = loads(cart.text)
+    items = cart_json['items']
+    for item in items:
+        item['amount'] = 0
+    cart = app.order_fixture.cart(head=app.token_autorization(), dataset=items)
+
+    cart_auth_user = app.order_fixture.cart(head=app.token_autorization(),
+                                            dataset=app.order_fixture.generate_payload(2))
+    # formatted_json_str = pprint.pformat(cart_auth_user.text)
+    # print(cart_auth_user.request.body)
+    # print(cart_auth_user.url, formatted_json_str, sep='\n\n')
+    # assert cart_auth_user.status_code == 200
+
+    token_shadow_user = app.token_shadow_user()
+
+    put_the_item_in_the_cart_shadow_user = app.order_fixture.cart(head=token_shadow_user,
+                                                                  dataset=app.order_fixture.generate_payload(2))
+
+    # formatted_json_str = pprint.pformat(put_the_item_in_the_cart_shadow_user.text)
+    # print(put_the_item_in_the_cart_shadow_user.request.body)
+    # print(put_the_item_in_the_cart_shadow_user.url, formatted_json_str, sep='\n\n')
+    # assert put_the_item_in_the_cart_shadow_user.status_code == 200
+
+    auth_user = app.auth_for_migration(code='9213', phone='+79139519213', access_token=token_shadow_user)
+    token_autn_user = loads(auth_user.text)['token']
+    assert auth_user.status_code == 200
+    assert "\"token\":" in auth_user.text
+
+    cart_auth_user_after_authorization = app.order_fixture.get_cart_user(head={'Authorization': 'Bearer {}'.format(token_autn_user)})
+
+    spisok1 = loads(cart_auth_user_after_authorization.text)['items']
+
+    spisok2 = loads(cart_auth_user.text)['items'] + loads(put_the_item_in_the_cart_shadow_user.text)['items']
+
+    # res = [x for x in spisok1 + spisok2 if x not in spisok1 or x not in spisok2]
+    # print(res)
+
+    # for item in loads(cart_auth_user_after_authorization.text)['items']:
+    #     item['itemId'] == spisok['itemId']
+
+
+
+    #loads(cart_auth_user.text)['items'] or loads(put_the_item_in_the_cart_shadow_user.text)['items']['itemId']:
+
+    assert loads(cart_auth_user_after_authorization.text)['items'] == loads(cart_auth_user.text)['items'] + loads(put_the_item_in_the_cart_shadow_user.text)['items']
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

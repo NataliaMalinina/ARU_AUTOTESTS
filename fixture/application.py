@@ -6,6 +6,8 @@ from fixture.orders_helper import OrdersHelper
 class Application:
 
     _s = requests.session()
+    _s.headers.update({
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36'})
     host = None
 
     def __init__(self, host):

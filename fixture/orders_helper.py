@@ -27,11 +27,6 @@ class OrdersHelper:
         body = {"items": dataset}
         return self.app._s.put(self.app.host + '/Cart', json=body, headers=head)
 
-    # def token(self):
-    #     cart = loads(self.cart((self, head=None, dataset=None, userId=None).text)
-    #     head = {'Authorization': f"Bearer {cart['token']}"}
-    #     return head
-
     def cart(self, head, dataset, userId=None):                      #метод для SU и User
         body = {"items": dataset, "userId": userId}
         return self.app._s.put(self.app.host + '/Cart', json=body, headers=head)                                        #{"content-type": "application/json; charset=UTF-8",'Authorization':'Bearer {}'.format(head)})
