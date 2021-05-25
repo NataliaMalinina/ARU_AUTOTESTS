@@ -1099,8 +1099,8 @@ def test_promocode_for_special_wrong_good(app):
                                                                         head=app.token_autorization())
     assert delete_promocode.status_code == 200
 
-# СДЕЛАТЬ ПОСЛЕ ТОГО как покажу 500
-def test_promocode_for_special_good_over_the_limit_count_in_mounth(app): # Взят токен резервного пользователя +79833221020, так как тот тужен был для теста
+
+def test_promocode_for_special_good_over_the_limit_count_in_mounth(app):
     dataset = [{
         'itemId': '5d65073f2fd44a0001b124b0',
         'amount': 11,
@@ -1108,21 +1108,21 @@ def test_promocode_for_special_good_over_the_limit_count_in_mounth(app): # Вз�
     }]
 
     choice_autodest_before_order = app.choice_autodest(id=choice(parameters.autodestid_for_order),
-                                                       head=app.token_autorization_reserv_user())
+                                                       head=app.token_autorization())
     formatted_json_str = pprint.pformat(choice_autodest_before_order.text)
     print(choice_autodest_before_order.request.body)
     print(choice_autodest_before_order, formatted_json_str, sep='\n\n')
     assert choice_autodest_before_order.status_code == 200
 
     put_the_item_in_the_cart = app.order_fixture.cart(dataset=dataset,
-                                                      head=app.token_autorization_reserv_user())
+                                                      head=app.token_autorization())
     formatted_json_str = pprint.pformat(put_the_item_in_the_cart.text)
     print(put_the_item_in_the_cart.request.body)
     print(put_the_item_in_the_cart, formatted_json_str, sep='\n\n')
     assert "\"tradeName\"" in put_the_item_in_the_cart.text
     assert put_the_item_in_the_cart.status_code == 200
 
-    use_promocode = app.order_fixture.cart_use_promocode(promoCode='9ZR1AOX', head=app.token_autorization_reserv_user())
+    use_promocode = app.order_fixture.cart_use_promocode(promoCode='9ZR1AOX', head=app.token_autorization())
     formatted_json_str = pprint.pformat(use_promocode.text)
     print(use_promocode.request.body)
     print(use_promocode, formatted_json_str, sep='\n\n')
@@ -1131,7 +1131,7 @@ def test_promocode_for_special_good_over_the_limit_count_in_mounth(app): # Вз�
     assert use_promocode.status_code == 200
 
     ordering = app.order_fixture.create_order(email=None, needEmail=False, needCall=False, mnogoRuCardId=None,
-                                               head=app.token_autorization_reserv_user())
+                                               head=app.token_autorization())
     formatted_json_str = pprint.pformat(ordering.text)
     print(ordering.request.body)
     print(ordering, formatted_json_str, sep='\n\n')
@@ -1189,7 +1189,7 @@ def test_promocode_for_special_good_over_the_limit_summ_in_mounth(app):  # Вз�
     # assert delete_promocode.status_code == 200
 
 
-def test_use_good_with_promocode_and_ordinary_good(app):
+def test_use_good_with_promocode_and_ordinary_good_without_promocode(app):
     dataset = [{
         'itemId': '5d6509c484406a0001aaf096',
         'amount': 1,
@@ -1230,6 +1230,112 @@ def test_use_good_with_promocode_and_ordinary_good(app):
     assert "\"orderId\"" in ordering.text
     assert "\"orderNum\"" in ordering.text
     assert len(loads(ordering.text)['order']['promoCodes']) != 0
+
+
+def test_use_good_with_promocode_and_ordinary_good_with_promocode_less(app): # кейс когда применяются оба промокода, один на потоварный товар, другой на обычный товар. Обычный промокод не больше потоварного, если больше, тогда он перекрывает скидку потоварного
+    dataset = [{
+        'itemId': '5d65044884406a0001aaaf77',
+        'amount': 1,
+        'deferred': False},
+        {
+            'itemId': '5d650c512fd44a0001b15e5a',
+            'amount': 1,
+            'deferred': False
+        },
+        {
+            'itemId': '5d6503502fd44a0001b0f57a',
+            'amount': 1,
+            'deferred': False
+        },
+    ]
+    choice_autodest_before_order = app.choice_autodest(id=choice(parameters.autodestid_for_order),
+                                                       head=app.token_autorization())
+    formatted_json_str = pprint.pformat(choice_autodest_before_order.text)
+    print(choice_autodest_before_order.request.body)
+    print(choice_autodest_before_order, formatted_json_str, sep='\n\n')
+    assert choice_autodest_before_order.status_code == 200
+
+    put_the_item_in_the_cart = app.order_fixture.cart(dataset=dataset,
+                                                      head=app.token_autorization())
+    formatted_json_str = pprint.pformat(put_the_item_in_the_cart.text)
+    print(put_the_item_in_the_cart.request.body)
+    print(put_the_item_in_the_cart, formatted_json_str, sep='\n\n')
+    assert "\"tradeName\"" in put_the_item_in_the_cart.text
+    assert put_the_item_in_the_cart.status_code == 200
+
+    use_promocode = app.order_fixture.cart_use_promocode(promoCode='TECTT2', head=app.token_autorization())
+    formatted_json_str = pprint.pformat(use_promocode.text)
+    print(use_promocode.request.body)
+    print(use_promocode, formatted_json_str, sep='\n\n')
+    assert loads(use_promocode.text)['promoCodes'][0]['isUsed'] == True
+    assert use_promocode.status_code == 200
+
+    use_promocode = app.order_fixture.cart_use_promocode(promoCode="RIGA2", head=app.token_autorization())
+    formatted_json_str = pprint.pformat(use_promocode.text)
+    print(use_promocode.request.body)
+    print(use_promocode, formatted_json_str, sep='\n\n')
+    assert loads(use_promocode.text)['promoCodes'][0]['isUsed'] == True
+    assert use_promocode.status_code == 200
+
+    ordering = app.order_fixture.create_order(email=None, needEmail=False, needCall=False, mnogoRuCardId=None,
+                                              head=app.token_autorization())
+    formatted_json_str = pprint.pformat(ordering.text)
+    print(ordering.request.body)
+    print(ordering, formatted_json_str, sep='\n\n')
+    assert ordering.status_code == 200
+    assert "\"orderId\"" in ordering.text
+    assert "\"orderNum\"" in ordering.text
+    assert len(loads(ordering.text)['order']['promoCodes']) == 2
+
+
+def test_use_good_with_promocode_and_ordinary_good_with_promocode_bigger(app): #обычный промокод перекрывает скидку от потоварного
+    dataset = [{
+        'itemId': '5d6509c484406a0001aaf096',
+        'amount': 1,
+        'deferred': False
+    },
+    {
+        'itemId': '5d650c512fd44a0001b15e5a',
+        'amount': 1,
+        'deferred': False
+    },
+    {
+        'itemId': '5d6503502fd44a0001b0f57a',
+        'amount': 1,
+        'deferred': False
+    },
+        ]
+    put_the_item_in_the_cart = app.order_fixture.cart(dataset=dataset,
+                                                      head=app.token_autorization())
+    formatted_json_str = pprint.pformat(put_the_item_in_the_cart.text)
+    print(put_the_item_in_the_cart.request.body)
+    print(put_the_item_in_the_cart, formatted_json_str, sep='\n\n')
+    assert "\"tradeName\"" in put_the_item_in_the_cart.text
+    assert put_the_item_in_the_cart.status_code == 200
+
+    use_promocode = app.order_fixture.cart_use_promocode(promoCode='5HZVHCJ', head=app.token_autorization())
+    formatted_json_str = pprint.pformat(use_promocode.text)
+    print(use_promocode.request.body)
+    print(use_promocode, formatted_json_str, sep='\n\n')
+    assert loads(use_promocode.text)['promoCodes'][0]['isUsed'] == True
+
+    use_promocode = app.order_fixture.cart_use_promocode(promoCode="RIGA2", head=app.token_autorization())
+    formatted_json_str = pprint.pformat(use_promocode.text)
+    print(use_promocode.request.body)
+    print(use_promocode, formatted_json_str, sep='\n\n')
+    assert loads(use_promocode.text)['promoCodes'][0]['isUsed'] == False
+    assert loads(use_promocode.text)['promoCodes'][1]['isUsed'] == True
+    assert use_promocode.status_code == 200
+
+    ordering = app.order_fixture.create_order(email=None, needEmail=False, needCall=False, mnogoRuCardId=None,
+                                              head=app.token_autorization())
+    formatted_json_str = pprint.pformat(ordering.text)
+    print(ordering.request.body)
+    print(ordering, formatted_json_str, sep='\n\n')
+    assert ordering.status_code == 200
+    assert "\"orderId\"" in ordering.text
+    assert "\"orderNum\"" in ordering.text
+    assert len(loads(ordering.text)['order']['promoCodes']) == 1
 
 
 #Olekstra
