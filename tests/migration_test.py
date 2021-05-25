@@ -49,7 +49,7 @@ def test_migration_shadow_user_to_auth_user_autodest(app):
     assert loads(user_preferences.text)['selectedAutoDest']['id'] == choice_autodest_id
 
 
-def test_migration_shadow_user_have_goods_to_auth_user_cart_not_have_any_good(app):
+def test_migration_shadow_user_have_goods_to_auth_user_cart_not_have_any_goods(app):
     cart = app.order_fixture.get_cart_user(head=app.token_autorization())
     cart_json = loads(cart.text)
     items = cart_json['items']
@@ -78,8 +78,15 @@ def test_migration_shadow_user_have_goods_to_auth_user_cart_not_have_any_good(ap
     assert cart_auth_user.status_code == 200
     assert loads(cart_auth_user.text)['items'] == loads(put_the_item_in_the_cart_shadow_user.text)['items']
 
+    items, items2 = dict(), dict()
+    for item in loads(cart_auth_user.text)['items']:
+        items[item['itemId']] = item['amount']
+    for item in loads(put_the_item_in_the_cart_shadow_user.text)['items']:
+        items2[item['itemId']] = item['amount']
+    assert items == items2
 
-def test_migration_shadow_user_not_have_goods_to_auth_user_cart_have_any_good(app):
+
+def test_migration_shadow_user_not_have_goods_to_auth_user_cart_have_any_goods(app):
     cart_auth_user = app.order_fixture.cart(head=app.token_autorization(), dataset=app.order_fixture.generate_payload(3))
     formatted_json_str = pprint.pformat(cart_auth_user.text)
     print(cart_auth_user.request.body)
@@ -100,8 +107,16 @@ def test_migration_shadow_user_not_have_goods_to_auth_user_cart_have_any_good(ap
     cart_auth_user_after_authorization = app.order_fixture.get_cart_user(head={'Authorization': 'Bearer {}'.format(token_autn_user)})
     assert len(loads(cart_auth_user_after_authorization.text)['items']) > len(loads(cart_shadow_user.text)['items'])
 
+    items, items2 = dict(), dict()
+    for item in loads(cart_auth_user_after_authorization.text)['items']:
+        items[item['itemId']] = item['amount']
+    for item in loads(cart_shadow_user.text)['items']:
+        items2[item['itemId']] = item['amount']
+    assert len(items) > len(items2)
 
-def test_migration_shadow_user_have_goods_to_auth_user_cart_also_have_any_good(app):
+
+def test_migration_shadow_user_have_goods_to_auth_user_cart_also_have_any_goods(app):
+    choice_city = app.choice_city(head=app.token_autorization(), id='5e574663f4d315000196b176', manualChange=True)
     cart = app.order_fixture.get_cart_user(head=app.token_autorization())
     cart_json = loads(cart.text)
     items = cart_json['items']
@@ -109,22 +124,23 @@ def test_migration_shadow_user_have_goods_to_auth_user_cart_also_have_any_good(a
         item['amount'] = 0
     cart = app.order_fixture.cart(head=app.token_autorization(), dataset=items)
 
+    choice_city = app.choice_city_shadow_user(id='5e574663f4d315000196b176', manualChange=True)
     cart_auth_user = app.order_fixture.cart(head=app.token_autorization(),
                                             dataset=app.order_fixture.generate_payload(2))
-    # formatted_json_str = pprint.pformat(cart_auth_user.text)
-    # print(cart_auth_user.request.body)
-    # print(cart_auth_user.url, formatted_json_str, sep='\n\n')
-    # assert cart_auth_user.status_code == 200
+    formatted_json_str = pprint.pformat(cart_auth_user.text)
+    print(cart_auth_user.request.body)
+    print(cart_auth_user.url, formatted_json_str, sep='\n\n')
+    assert cart_auth_user.status_code == 200
 
     token_shadow_user = app.token_shadow_user()
 
     put_the_item_in_the_cart_shadow_user = app.order_fixture.cart(head=token_shadow_user,
                                                                   dataset=app.order_fixture.generate_payload(2))
 
-    # formatted_json_str = pprint.pformat(put_the_item_in_the_cart_shadow_user.text)
-    # print(put_the_item_in_the_cart_shadow_user.request.body)
-    # print(put_the_item_in_the_cart_shadow_user.url, formatted_json_str, sep='\n\n')
-    # assert put_the_item_in_the_cart_shadow_user.status_code == 200
+    formatted_json_str = pprint.pformat(put_the_item_in_the_cart_shadow_user.text)
+    print(put_the_item_in_the_cart_shadow_user.request.body)
+    print(put_the_item_in_the_cart_shadow_user.url, formatted_json_str, sep='\n\n')
+    assert put_the_item_in_the_cart_shadow_user.status_code == 200
 
     auth_user = app.auth_for_migration(code='9213', phone='+79139519213', access_token=token_shadow_user)
     token_autn_user = loads(auth_user.text)['token']
@@ -137,17 +153,55 @@ def test_migration_shadow_user_have_goods_to_auth_user_cart_also_have_any_good(a
 
     spisok2 = loads(cart_auth_user.text)['items'] + loads(put_the_item_in_the_cart_shadow_user.text)['items']
 
-    # res = [x for x in spisok1 + spisok2 if x not in spisok1 or x not in spisok2]
-    # print(res)
+    items, items2 = dict(), dict()
+    for item in spisok1:
+        items[item['itemId']] = item['amount']
+    for item in spisok2:
+        items2[item['itemId']] = item['amount']
+    assert items == items2
 
-    # for item in loads(cart_auth_user_after_authorization.text)['items']:
-    #     item['itemId'] == spisok['itemId']
+
+def test_migration_shadow_user_not_have_goods_to_auth_user_cart_not_have_any_goods(app):
+    cart = app.order_fixture.get_cart_user(head=app.token_autorization())
+    cart_json = loads(cart.text)
+    items = cart_json['items']
+    for item in items:
+        item['amount'] = 0
+    cart = app.order_fixture.cart(head=app.token_autorization(), dataset=items)
+
+    token_shadow_user = app.token_shadow_user()
+    cart_shadow_user = app.order_fixture.get_cart_user(head=token_shadow_user)
+    formatted_json_str = pprint.pformat(cart_shadow_user.text)
+    print(cart_shadow_user.request.body)
+    print(cart_shadow_user.url, formatted_json_str, sep='\n\n')
+    assert cart_shadow_user.status_code == 200
+
+    auth_user = app.auth_for_migration(code='9213', phone='+79139519213', access_token=token_shadow_user)
+    token_autn_user = loads(auth_user.text)['token']
+    assert auth_user.status_code == 200
+    assert "\"token\":" in auth_user.text
+
+    cart_auth_user = app.order_fixture.get_cart_user(head={'Authorization': 'Bearer {}'.format(token_autn_user)})
+    formatted_json_str = pprint.pformat(cart_auth_user.text)
+    print(cart_auth_user.request.body)
+    print(cart_auth_user.url, formatted_json_str, sep='\n\n')
+    assert cart_auth_user.status_code == 200
+    assert loads(cart_auth_user.text)['items'] == loads(cart_shadow_user.text)['items']
+
+    items, items2 = dict(), dict()
+    for item in loads(cart_auth_user.text)['items']:
+        items[item['itemId']] = item['amount']
+    for item in loads(cart_shadow_user.text)['items']:
+        items2[item['itemId']] = item['amount']
+    assert items == items2
 
 
 
-    #loads(cart_auth_user.text)['items'] or loads(put_the_item_in_the_cart_shadow_user.text)['items']['itemId']:
 
-    assert loads(cart_auth_user_after_authorization.text)['items'] == loads(cart_auth_user.text)['items'] + loads(put_the_item_in_the_cart_shadow_user.text)['items']
+
+
+
+
 
 
 
