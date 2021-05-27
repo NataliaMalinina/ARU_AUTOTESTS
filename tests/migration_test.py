@@ -1,4 +1,3 @@
-import collections
 import pprint
 from json import loads
 from random import choice
